@@ -60,6 +60,9 @@ GLuint VAO,VBO;
 
 float aspectRatio = 1.f;
 
+float lastFrameTime = 0.0f;
+float deltaTime = 0.0f;
+
 glm::mat4 createCameraMatrix()
 {
 	glm::vec3 cameraSide = glm::normalize(glm::cross(cameraDir,glm::vec3(0.f,1.f,0.f)));
@@ -151,6 +154,10 @@ void renderScene(GLFWwindow* window)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glm::mat4 transformation;
 	float time = glfwGetTime();
+	deltaTime = time - lastFrameTime;
+	deltaTime = glm::min(deltaTime, 0.1f);
+	lastFrameTime = time;
+
 
 	glUseProgram(programSkybox);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix() * glm::translate(cameraPos);
@@ -293,18 +300,18 @@ void init(GLFWwindow* window)
 	loadModelToContext("./models/spaceship.obj", shipContext);
 	loadModelToContext("./models/cube.obj", cubeMapContex);
 	//texture::skybox = loadSkybox();
-	texture::earth = Core::LoadTexture("textures/8k_earth_daymap.jpg");
-	texture::ship = Core::LoadTexture("textures/spaceship.png");
-	texture::moon = Core::LoadTexture("textures/8k_moon.jpg");
-	texture::rust = Core::LoadTexture("textures/rust.png");
-	texture::earthNormal = Core::LoadTexture("textures/earth2_normals.png");
-	texture::shipNormal = Core::LoadTexture("textures/spaceship_normal.jpg");
-	texture::moonNormal = Core::LoadTexture("textures/moon_normal.jpg");
+	texture::earth = Core::LoadTexture("textures/planets/8k_earth_daymap.jpg");
+	texture::ship = Core::LoadTexture("textures/spaceship/spaceship.png");
+	texture::moon = Core::LoadTexture("textures/planets/8k_moon.jpg");
+	texture::rust = Core::LoadTexture("textures/spaceship/rust.png");
+	texture::earthNormal = Core::LoadTexture("textures/planets/earth2_normals.png");
+	texture::shipNormal = Core::LoadTexture("textures/spaceship/spaceship_normal.jpg");
+	texture::moonNormal = Core::LoadTexture("textures/planets/moon_normal.jpg");
 	texture::grid = Core::LoadTexture("textures/grid.png");
-	texture::asteroidNormal = Core::LoadTexture("textures/scratches.png");
-	texture::clouds = Core::LoadTexture("textures/8k_earth_clouds.jpg");
-	texture::sun = Core::LoadTexture("textures/8k_sun.jpg");
-	texture::rustNormal = Core::LoadTexture("textures/rust_normal.jpg");
+	texture::asteroidNormal = Core::LoadTexture("textures/spaceship/scratches.png");
+	texture::clouds = Core::LoadTexture("textures/planets/8k_earth_clouds.jpg");
+	texture::sun = Core::LoadTexture("textures/planets/8k_sun.jpg");
+	texture::rustNormal = Core::LoadTexture("textures/spaceship/rust_normal.jpg");
 }
 
 void shutdown(GLFWwindow* window)
@@ -317,8 +324,8 @@ void processInput(GLFWwindow* window)
 {
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::vec3(0.f, 1.f, 0.f);
-	float angleSpeed = 0.05f;
-	float moveSpeed = 0.025f;
+	float angleSpeed = 2.f * deltaTime;
+	float moveSpeed = 2.f * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
