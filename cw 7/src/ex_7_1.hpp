@@ -14,7 +14,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <string>
-#include <..\..\src\SOIL\SOIL.h>
+#include <..\..\cw 7\src\SOIL\SOIL.h>
+//#include <..\..\src\SOIL\SOIL.h>
 #include <vector>
 
 
@@ -192,8 +193,8 @@ void renderScene(GLFWwindow* window)
 	//	glm::vec3(0.3, 0.3, 0.5)
 	//	);
 	drawObjectTexture(programShip, shipContext,
-		glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()),
-		texture::ship,texture::shipNormal
+		glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f)),
+		texture::ship, texture::shipNormal
 	);
 
 	//glUseProgram(0);
@@ -299,7 +300,7 @@ void init(GLFWwindow* window)
 	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
 	
 	loadModelToContext("./models/sphere.obj", sphereContext);
-	loadModelToContext("./models/spaceship.obj", shipContext);
+	loadModelToContext("./models/SciFi_Fighter.fbx", shipContext);
 	loadModelToContext("./models/cube.obj", cubeMapContex);
 	//texture::skybox = loadSkybox();
 	texture::earth = Core::LoadTexture("textures/planets/8k_earth_daymap.jpg");
