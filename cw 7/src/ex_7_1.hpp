@@ -60,6 +60,9 @@ GLuint VAO,VBO;
 
 float aspectRatio = 1.f;
 
+float lastFrameTime = 0.0f;
+float deltaTime = 0.0f;
+
 glm::mat4 createCameraMatrix()
 {
 	glm::vec3 cameraSide = glm::normalize(glm::cross(cameraDir,glm::vec3(0.f,1.f,0.f)));
@@ -153,6 +156,10 @@ void renderScene(GLFWwindow* window)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glm::mat4 transformation;
 	float time = glfwGetTime();
+	deltaTime = time - lastFrameTime;
+	deltaTime = glm::min(deltaTime, 0.1f);
+	lastFrameTime = time;
+
 
 	glUseProgram(programSkybox);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix() * glm::translate(cameraPos);
@@ -319,8 +326,8 @@ void processInput(GLFWwindow* window)
 {
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::vec3(0.f, 1.f, 0.f);
-	float angleSpeed = 0.05f;
-	float moveSpeed = 0.025f;
+	float angleSpeed = 2.f * deltaTime;
+	float moveSpeed = 2.f * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
