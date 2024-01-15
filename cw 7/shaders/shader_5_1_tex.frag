@@ -17,7 +17,6 @@ void main()
     float diffuse = max(0, dot(normal, lightDir));
 
     vec4 textureColor = texture(tex, fragTexCoord);
- нового цвета базового пикселя
     vec3 newColor = textureColor.rgb;
 
     outColor = vec4(newColor * min(1, AMBIENT + diffuse), 1.0);

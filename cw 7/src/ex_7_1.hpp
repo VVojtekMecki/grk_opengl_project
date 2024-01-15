@@ -14,7 +14,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <string>
-#include <..\..\src\SOIL\SOIL.h>
+#include <..\..\cw 7\src\SOIL\SOIL.h>
 #include <vector>
 
 
@@ -111,13 +111,11 @@ void drawObjectColor(Core::RenderContext& context, glm::mat4 modelMatrix, glm::v
 }
 void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
 	glUseProgram(program);
-	//glUseProgram(skyboxProgram);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
-	//glUniform3f(glGetUniformLocation(program, "lightPos"), 0, 0, 0);
-	//Core::SetActiveTexture(textureID, "colorTexture", programTex, 0);
+
 	if (textureID == texture::sun) {
 		Core::SetActiveTexture(textureID, "tex", program, 0);
 	}
