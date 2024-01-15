@@ -295,18 +295,18 @@ void init(GLFWwindow* window)
 	loadModelToContext("./models/spaceship.obj", shipContext);
 	loadModelToContext("./models/cube.obj", cubeMapContex);
 	//texture::skybox = loadSkybox();
-	texture::earth = Core::LoadTexture("textures/8k_earth_daymap.jpg");
-	texture::ship = Core::LoadTexture("textures/spaceship.png");
-	texture::moon = Core::LoadTexture("textures/8k_moon.jpg");
-	texture::rust = Core::LoadTexture("textures/rust.png");
-	texture::earthNormal = Core::LoadTexture("textures/earth2_normals.png");
-	texture::shipNormal = Core::LoadTexture("textures/spaceship_normal.jpg");
-	texture::moonNormal = Core::LoadTexture("textures/moon_normal.jpg");
+	texture::earth = Core::LoadTexture("textures/planets/8k_earth_daymap.jpg");
+	texture::ship = Core::LoadTexture("textures/spaceship/spaceship.png");
+	texture::moon = Core::LoadTexture("textures/planets/8k_moon.jpg");
+	texture::rust = Core::LoadTexture("textures/spaceship/rust.png");
+	texture::earthNormal = Core::LoadTexture("textures/planets/earth2_normals.png");
+	texture::shipNormal = Core::LoadTexture("textures/spaceship/spaceship_normal.jpg");
+	texture::moonNormal = Core::LoadTexture("textures/planets/moon_normal.jpg");
 	texture::grid = Core::LoadTexture("textures/grid.png");
-	texture::asteroidNormal = Core::LoadTexture("textures/scratches.png");
-	texture::clouds = Core::LoadTexture("textures/8k_earth_clouds.jpg");
-	texture::sun = Core::LoadTexture("textures/8k_sun.jpg");
-	texture::rustNormal = Core::LoadTexture("textures/rust_normal.jpg");
+	texture::asteroidNormal = Core::LoadTexture("textures/spaceship/scratches.png");
+	texture::clouds = Core::LoadTexture("textures/planets/8k_earth_clouds.jpg");
+	texture::sun = Core::LoadTexture("textures/planets/8k_sun.jpg");
+	texture::rustNormal = Core::LoadTexture("textures/spaceship/rust_normal.jpg");
 }
 
 void shutdown(GLFWwindow* window)
