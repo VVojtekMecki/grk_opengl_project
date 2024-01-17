@@ -15,6 +15,7 @@
 #include <assimp/postprocess.h>
 #include <string>
 #include <..\..\cw 7\src\SOIL\SOIL.h>
+//#include <..\..\src\SOIL\SOIL.h>
 #include <vector>
 
 
@@ -214,8 +215,8 @@ void renderScene(GLFWwindow* window)
 	//	glm::vec3(0.3, 0.3, 0.5)
 	//	);
 	drawObjectTexture(programShip, shipContext,
-		glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()),
-		texture::ship,texture::shipNormal
+		glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f)),
+		texture::ship, texture::shipNormal
 	);
 
 	//glUseProgram(0);
