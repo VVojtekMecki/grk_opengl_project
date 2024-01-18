@@ -28,6 +28,7 @@ namespace texture {
 
 	GLuint aliensPlanet;
 	GLuint aliensPlanetNormal;
+	GLuint aliensPlanetClouds;
 
 	GLuint venus;
 	GLuint venusNormal;
@@ -148,7 +149,7 @@ void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 m
 		Core::SetActiveTexture(texture::sun , "tex", program, 0);
 	}
 	else if (textureID == texture::earth) {
-		Core::SetActiveTexture(texture::earth, "earth", program, 0);
+		Core::SetActiveTexture(textureID, "earth", program, 0);
 		Core::SetActiveTexture(texture::clouds, "clouds", program, 1);
 		Core::SetActiveTexture(normalmapId, "normalSampler", program, 2);
 	}
@@ -165,6 +166,15 @@ void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 m
 		Core::SetActiveTexture(normalmapId, "normalSampler", program, 3);
 
 
+	}
+	else if (textureID == texture::aliensPlanet) {
+		Core::SetActiveTexture(textureID, "earth", program, 0);
+		Core::SetActiveTexture(texture::clouds, "clouds", program, 1);
+		Core::SetActiveTexture(normalmapId, "normalSampler", program, 2);
+	}
+	else {
+		Core::SetActiveTexture(textureID, "tex", program, 0);
+		Core::SetActiveTexture(normalmapId, "normalSampler", program, 1);
 	}
 
 	Core::DrawContext(context);
@@ -192,13 +202,28 @@ void renderScene(GLFWwindow* window)
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//glUniform1i(glGetUniformLocation(skyboxProgram, "skybox"), 0);
 
+	//sun
 	drawObjectTexture(programSun, sphereContext, glm::mat4(), texture::sun, texture::sun);
+	//earth
 	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::earth, texture::earthNormal);
-
-
-
+	//moon
 	drawObjectTexture(programTex, sphereContext,
 		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(1.f, 0, 0)) * glm::scale(glm::vec3(0.1f)), texture::moon, texture::moonNormal);
+	//haumea
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(8.f, 0, 0)) * glm::scale(glm::vec3(0.6f)), texture::haumea, texture::haumeaNormal);
+	//mars
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY((time +6) / 3) * glm::translate(glm::vec3(2.f, 0, 0)) * glm::scale(glm::vec3(0.2f)), texture::mars, texture::marsNormal);
+	//aliens planet
+	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(time/3) * glm::translate(glm::vec3(12.f, 0, 0)) * glm::scale(glm::vec3(0.39f)), texture::aliensPlanet, texture::aliensPlanetNormal);
+	//venus
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 4) * glm::translate(glm::vec3(6.f, 0, 0)) * glm::scale(glm::vec3(0.29f)), texture::venus, texture::venusNormal);
+	
+	//mercury
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time/2) * glm::translate(glm::vec3(9.f, 0, 0)) * glm::scale(glm::vec3(0.39f)), texture::mercury, texture::mercuryNormal);
+
+
+
+
 
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::normalize(glm::cross(spaceshipSide, spaceshipDir));
@@ -322,7 +347,7 @@ void init(GLFWwindow* window)
 	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
 	
 	loadModelToContext("./models/sphere.obj", sphereContext);
-	loadModelToContext("./models/spaceship.obj", shipContext);
+	loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 	//loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 	loadModelToContext("./models/cube.obj", cubeMapContex);
 
@@ -355,6 +380,7 @@ void init(GLFWwindow* window)
 
 	texture::aliensPlanet = Core::LoadTexture("textures/planets/aliensPlanet.png");
 	texture::aliensPlanetNormal = Core::LoadTexture("textures/planets/aliensPlanet_normal.jpg");
+	texture::aliensPlanetClouds = Core::LoadTexture("textures/planets/aliensPlanet_clouds.jpg");
 
 	texture::venus = Core::LoadTexture("textures/planets/venus.jpg");
 	texture::venusNormal = Core::LoadTexture("textures/planets/venus_normal.jpg");
