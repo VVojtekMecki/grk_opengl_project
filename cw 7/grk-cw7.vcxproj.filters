@@ -86,7 +86,7 @@
     <ClInclude Include="src\SOIL\image_DXT.h">
       <Filter>Source Files\SOIL</Filter>
     </ClInclude>
-    <ClInclude Include="src\ex_7_1.hpp">
+    <ClInclude Include="src\scene.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="egor.hpp">
