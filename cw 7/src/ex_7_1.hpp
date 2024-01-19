@@ -203,23 +203,22 @@ void renderScene(GLFWwindow* window)
 	//glUniform1i(glGetUniformLocation(skyboxProgram, "skybox"), 0);
 
 	//sun
-	drawObjectTexture(programSun, sphereContext, glm::mat4(), texture::sun, texture::sun);
+	drawObjectTexture(programSun, sphereContext, glm::mat4() * glm::scale(glm::vec3(4.f)), texture::sun, texture::sun);
 	//earth
-	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::scale(glm::vec3(0.3f)), texture::earth, texture::earthNormal);
+	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)), texture::earth, texture::earthNormal);
 	//moon
 	drawObjectTexture(programTex, sphereContext,
-		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(1.f, 0, 0)) * glm::scale(glm::vec3(0.1f)), texture::moon, texture::moonNormal);
-	//haumea
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(8.f, 0, 0)) * glm::scale(glm::vec3(0.6f)), texture::haumea, texture::haumeaNormal);
+		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)), texture::moon, texture::moonNormal);
 	//mars
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY((time +6) / 3) * glm::translate(glm::vec3(2.f, 0, 0)) * glm::scale(glm::vec3(0.2f)), texture::mars, texture::marsNormal);
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY((time +6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f)), texture::mars, texture::marsNormal);
 	//aliens planet
-	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(time/3) * glm::translate(glm::vec3(12.f, 0, 0)) * glm::scale(glm::vec3(0.39f)), texture::aliensPlanet, texture::aliensPlanetNormal);
+	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(time/3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f)), texture::aliensPlanet, texture::aliensPlanetNormal);
 	//venus
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 4) * glm::translate(glm::vec3(6.f, 0, 0)) * glm::scale(glm::vec3(0.29f)), texture::venus, texture::venusNormal);
-	
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f)), texture::venus, texture::venusNormal);
+	//haumea
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f)), texture::haumea, texture::haumeaNormal);
 	//mercury
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time/2) * glm::translate(glm::vec3(9.f, 0, 0)) * glm::scale(glm::vec3(0.39f)), texture::mercury, texture::mercuryNormal);
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time/2) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f)), texture::mercury, texture::mercuryNormal);
 
 
 
