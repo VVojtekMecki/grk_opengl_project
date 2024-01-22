@@ -42,8 +42,8 @@ namespace texture {
 	GLuint haumea;
 	GLuint haumeaNormal;
 
-
-	
+	GLuint asteroid_grey;
+	GLuint asteroid_red;
 
 	GLuint ship;
 	GLuint rust;
@@ -69,6 +69,7 @@ GLuint programEarth;
 GLuint programProcTex;
 GLuint programShip;
 GLuint programSkybox;
+GLuint programAsteroid;
 
 Core::Shader_Loader shaderLoader;
 
@@ -76,6 +77,7 @@ Core::RenderContext shipContext;
 Core::RenderContext sphereContext;
 Core::RenderContext cubeMapContex;
 Core::RenderContext mercuryPlanetContex;
+Core::RenderContext asteroidContext;
 
 glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
@@ -83,12 +85,36 @@ glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
 glm::vec3 spaceshipPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 spaceshipDir = glm::vec3(1.f, 0.f, 0.f);
 GLuint VAO,VBO;
-
+GLuint asteroidVAO;
+GLuint asteroidVBO; // Буфер вершин
+GLuint asteroidEBO; // Буфер индексов
+GLsizei asteroidIndicesCount;
 float aspectRatio = 1.f;
 
 float lastFrameTime = 0.0f;
 float deltaTime = 0.0f;
+struct Vertex {
+	glm::vec3 position;
+	glm::vec3 color;
+	// Дополнительные данные, такие как нормали, текстурные координаты и т.д.
+};
 
+// Пример данных для буфера вершин
+std::vector<Vertex> vertices = {
+	// Вершина 1
+	{glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f)},
+	// Вершина 2
+	{glm::vec3(1.0f, -1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},
+	// Вершина 3
+	{glm::vec3(0.0f,  1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)}
+	// Дополнительные вершины...
+};
+
+// Пример данных для буфера индексов
+std::vector<GLuint> indices = {
+	0, 1, 2 // Порядок вершин, определяющий треугольники
+	// Дополнительные индексы...
+};
 glm::mat4 createCameraMatrix()
 {
 	glm::vec3 cameraSide = glm::normalize(glm::cross(cameraDir,glm::vec3(0.f,1.f,0.f)));
@@ -126,16 +152,21 @@ glm::mat4 createPerspectiveMatrix()
 	return perspectiveMatrix;
 }
 
-void drawObjectColor(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color) {
+void drawObjectColor(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color, int instanceCount) {
 
 	glUseProgram(program);
+	glBindVertexArray(asteroidVAO);
+
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
 	glUniform3f(glGetUniformLocation(program, "color"), color.x, color.y, color.z);
 	glUniform3f(glGetUniformLocation(program, "lightPos"), 0,0,0);
+
+	glDrawElementsInstanced(GL_TRIANGLES, asteroidIndicesCount, GL_UNSIGNED_INT, 0, instanceCount);
 	Core::DrawContext(context);
+	glUseProgram(0);
 
 }
 void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
@@ -181,6 +212,29 @@ void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 m
 	glUseProgram(0);
 }
 
+void drawAsteroid(Core::RenderContext& asteroidContext, float scale, float rotationSpeed, const glm::vec3& translate, float time, int instanceCount) {
+	glm::mat4 asteroidScale = glm::scale(glm::vec3(scale));
+	glm::mat4 asteroidRotate = glm::rotate(time * rotationSpeed, glm::vec3(0, 1, 0));
+	glm::mat4 asteroidTranslate = glm::translate(translate);
+
+	drawObjectColor(asteroidContext, asteroidScale * asteroidRotate * asteroidTranslate,  glm::vec3(0.50, 0.5, 0.5), instanceCount);
+}
+
+int getRandomNumber(int min, int max)
+{
+	static const double fraction = 1.0 / (static_cast<double>(RAND_MAX) + 1.0);
+	return static_cast<int>(rand() * fraction * (max - min + 1) + min);
+}
+
+void drawAsteroidInstanced(Core::RenderContext& context, int instanceCount) {
+	glUseProgram(programAsteroid);
+	glBindVertexArray(asteroidVAO);
+
+	glDrawElementsInstanced(GL_TRIANGLES, asteroidIndicesCount, GL_UNSIGNED_INT, 0, instanceCount);
+	Core::DrawContext(context);
+	glBindVertexArray(0);
+	glUseProgram(0);
+}
 void renderScene(GLFWwindow* window)
 {
 
@@ -220,8 +274,24 @@ void renderScene(GLFWwindow* window)
 	//mercury
 	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time/2) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f)), texture::mercury, texture::mercuryNormal);
 
+	float position = -30.0f;
+	int amount = 5;
+		for (int group = 0; group < 12; group++) {
+			position = position + 10.0f;
+			/*for (int asteroid = 0; asteroid < amount; asteroid++) {
+				
+				//glm::vec3 translate = glm::vec3(float(groupPositionX) + relativeX, float(groupPositionY) + relativeY, 12.0f + relativeZ);
+				drawAsteroid(asteroidContext, scale, rotationSpeed, translate, time);
+			}
+			*/
+			float scale = 1.0f;
+			float rotationSpeed = 0.01f;
+			glm::vec3 translate = glm::vec3(position + 2.0f, float(group % 3), position + 12.0f + group / 3.0f);
 
+			drawAsteroid(asteroidContext, scale, rotationSpeed, translate, time, amount);
+			amount--;
 
+		}
 
 
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
@@ -245,6 +315,45 @@ void renderScene(GLFWwindow* window)
 
 	//glUseProgram(0);
 	glfwSwapBuffers(window);
+}
+
+void initAsteroidRendering() {
+	// Генерация VAO
+	glGenVertexArrays(1, &asteroidVAO);
+	glBindVertexArray(asteroidVAO);
+
+	// Генерация буфера вершин
+	glGenBuffers(1, &asteroidVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, asteroidVBO);
+
+	// Ваши вершины для астероида
+	Vertex asteroidVertices[] = {
+		{glm::vec3(-1.0f, -1.0f, 0.0f)},
+		{glm::vec3(1.0f, -1.0f, 0.0f)},
+		{glm::vec3(1.0f, 1.0f, 0.0f)},
+		{glm::vec3(-1.0f, 1.0f, 0.0f)}
+	};
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(asteroidVertices), asteroidVertices, GL_STATIC_DRAW);
+
+	// Настройка указателей атрибутов
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
+	// Генерация буфера индексов
+	glGenBuffers(1, &asteroidEBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, asteroidEBO);
+
+	// Ваши индексы для астероида
+	GLuint asteroidIndices[] = {
+		0, 1, 2,
+		2, 3, 0
+	};
+
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(asteroidIndices), asteroidIndices, GL_STATIC_DRAW);
+
+	// Сохранение количества индексов
+	asteroidIndicesCount = sizeof(asteroidIndices) / sizeof(GLuint);
 }
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -299,7 +408,7 @@ void loadModelToContext(std::string path, Core::RenderContext& context)
 
 void init(GLFWwindow* window)
 {
-
+	initAsteroidRendering();
 	glGenTextures(1, &texture::cubemap);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texture::cubemap);
 	int w, h;
@@ -344,11 +453,15 @@ void init(GLFWwindow* window)
 	programSun = shaderLoader.CreateProgram("shaders/shader_5_sun.vert", "shaders/shader_5_sun.frag");
 	programShip = shaderLoader.CreateProgram("shaders/shader_ship.vert", "shaders/shader_ship.frag");
 	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
+	programAsteroid = shaderLoader.CreateProgram("shaders/shader_asteroid.vert", "shaders/shader_asteroid.frag");
+
 	
 	loadModelToContext("./models/sphere.obj", sphereContext);
 	loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 	//loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 	loadModelToContext("./models/cube.obj", cubeMapContex);
+	loadModelToContext("./models/asteroid.obj", asteroidContext);
+
 
 	
 
@@ -393,6 +506,8 @@ void init(GLFWwindow* window)
 	texture::haumea = Core::LoadTexture("textures/planets/haumea.jpg");
 	texture::haumeaNormal = Core::LoadTexture("textures/planets/haumea_normal.jpg");
 
+	texture::asteroid_grey = Core::LoadTexture("textures/asteroids/4k_haumea_fictional.jpg");
+	texture::asteroid_red = Core::LoadTexture("textures/asteroids/4k_makemake_fictional.jpg");
 
 
 
@@ -410,8 +525,8 @@ void processInput(GLFWwindow* window)
 {
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::vec3(0.f, 1.f, 0.f);
-	float angleSpeed = 2.f * deltaTime;
-	float moveSpeed = 2.f * deltaTime;
+	float angleSpeed = 4.f * deltaTime;
+	float moveSpeed = 4.f * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
