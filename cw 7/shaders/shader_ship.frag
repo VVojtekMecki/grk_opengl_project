@@ -30,8 +30,8 @@ void main()
     vec4 asteroidColor = texture(asteroid, fragTexCoord);
     vec4 rustColor = texture(rust, fragTexCoord);
     vec4 shipColor = texture(ship, fragTexCoord);  
-    vec3 mixedRust = mix(vec3(1.0), shipColor.rgb, rustColor.r);
-    vec3 finalColor = mix(mixedRust, mixedRust.rgb, asteroidColor.r);
+    vec3 finalColor = mix(vec3(1.0), shipColor.rgb, rustColor.r)+asteroidColor.rgb*0.2;
+    //vec3 finalColor = mix(mixedRust, mixedRust.rgb, asteroidColor.r);
     //outColor = vec4(finalColor, 1.0) * 5.5;
     outColor = vec4(finalColor * min(1, AMBIENT + diffuse), 1.0);
 }

@@ -44,6 +44,7 @@ namespace texture {
 
 	GLuint asteroid_grey;
 	GLuint asteroid_red;
+	GLuint asteroidNormal;
 
 	GLuint ship;
 	GLuint rust;
@@ -220,10 +221,25 @@ void drawAsteroid(Core::RenderContext& asteroidContext, float scale, float rotat
 	drawObjectColor(asteroidContext, asteroidScale * asteroidRotate * asteroidTranslate,  glm::vec3(0.50, 0.5, 0.5), instanceCount);
 }
 
-int getRandomNumber(int min, int max)
+	int getRandomNumber(int min, int max) {
+		// »нициализаци€ генератора случайных чисел
+
+		// √енераци€ случайного числа в заданном диапазоне
+		int randomNumber = rand() % (max - min + 1) + min;
+		return randomNumber;
+	}
+
+/*int getRandomNumber(int min, int max)
 {
 	static const double fraction = 1.0 / (static_cast<double>(RAND_MAX) + 1.0);
 	return static_cast<int>(rand() * fraction * (max - min + 1) + min);
+}*/
+
+
+double getDoubleRandomNumber(double min, double max)
+{
+	static const double fraction = 1.0 / (static_cast<double>(RAND_MAX) + 1.0);
+	return static_cast<double>(rand() * fraction * (max - min ) + min);
 }
 
 void drawAsteroidInstanced(Core::RenderContext& context, int instanceCount) {
@@ -241,10 +257,10 @@ void renderScene(GLFWwindow* window)
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glm::mat4 transformation;
-	float time = glfwGetTime();
-	deltaTime = time - lastFrameTime;
+	float timeGL = glfwGetTime();
+	deltaTime = timeGL - lastFrameTime;
 	deltaTime = glm::min(deltaTime, 0.1f);
-	lastFrameTime = time;
+	lastFrameTime = timeGL;
 
 
 	glUseProgram(programSkybox);
@@ -259,39 +275,94 @@ void renderScene(GLFWwindow* window)
 	//sun
 	drawObjectTexture(programSun, sphereContext, glm::mat4() * glm::scale(glm::vec3(4.f)), texture::sun, texture::sun);
 	//earth
-	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)), texture::earth, texture::earthNormal);
+	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(timeGL / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)), texture::earth, texture::earthNormal);
 	//moon
 	drawObjectTexture(programTex, sphereContext,
-		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)), texture::moon, texture::moonNormal);
+		glm::eulerAngleY(timeGL / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(timeGL) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)), texture::moon, texture::moonNormal);
 	//mars
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY((time +6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f)), texture::mars, texture::marsNormal);
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY((timeGL +6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f)), texture::mars, texture::marsNormal);
 	//aliens planet
-	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(time/3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f)), texture::aliensPlanet, texture::aliensPlanetNormal);
+	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(timeGL /3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f)), texture::aliensPlanet, texture::aliensPlanetNormal);
 	//venus
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f)), texture::venus, texture::venusNormal);
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(timeGL / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f)), texture::venus, texture::venusNormal);
 	//haumea
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f)), texture::haumea, texture::haumeaNormal);
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(timeGL / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f)), texture::haumea, texture::haumeaNormal);
 	//mercury
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time/2) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f)), texture::mercury, texture::mercuryNormal);
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(timeGL /2) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f)), texture::mercury, texture::mercuryNormal);
 
-	float position = -30.0f;
+	float position = -20.0f;
+	int positionX, positionY, positionZ = 0;
 	int amount = 5;
-		for (int group = 0; group < 12; group++) {
-			position = position + 10.0f;
-			/*for (int asteroid = 0; asteroid < amount; asteroid++) {
-				
-				//glm::vec3 translate = glm::vec3(float(groupPositionX) + relativeX, float(groupPositionY) + relativeY, 12.0f + relativeZ);
-				drawAsteroid(asteroidContext, scale, rotationSpeed, translate, time);
-			}
-			*/
-			float scale = 1.0f;
-			float rotationSpeed = 0.01f;
-			glm::vec3 translate = glm::vec3(position + 2.0f, float(group % 3), position + 12.0f + group / 3.0f);
+		/*for (int group = 0; group < 3; group++) {
+			for (int asteroid = 0; asteroid < amount; asteroid++) {
+				positionX = getRandomNumber()
+				glm::mat4 asteroidScale = glm::scale(glm::vec3(0.5f));
+				glm::mat4 asteroidRotate = glm::rotate(time * 0.01f, glm::vec3(0, 1, 0));
+				//glm::vec3 translate = glm::vec3(position + 2.0f, float(group % 3), position + 12.0f + group / 3.0f);
 
-			drawAsteroid(asteroidContext, scale, rotationSpeed, translate, time, amount);
+				glm::mat4 asteroidTranslate = glm::translate(glm::vec3(position-1.0f , position-2.0f ,position-1.0f +0.3f));
+				//glm::vec3 translate = glm::vec3(float(groupPositionX) + relativeX, float(groupPositionY) + relativeY, 12.0f + relativeZ);
+				drawObjectTexture(programTex, asteroidContext, asteroidScale*asteroidRotate*asteroidTranslate,texture::asteroid_grey, texture::asteroidNormal) ;
+				position++;
+			}
+			position = position + 10.0f;
+
 			amount--;
 
-		}
+		}*/
+	srand(static_cast<unsigned>(time(NULL)));
+
+	//positionX = 0;
+	//positionY = -1;
+	//positionZ = 12;
+	for (int asteroid=0; asteroid < 20; asteroid++) {
+		positionX = getRandomNumber(-2, 2);
+		positionY = getRandomNumber(-10, 10);
+		positionZ = getRandomNumber(-15, 15);
+		bool truePositionZ = false;
+
+
+
+		/*while (truePositionZ != true) {
+			positionZ = getRandomNumber(-15, 15);
+
+			if (positionZ < -8 || positionZ > 8) {
+				truePositionZ = true;
+				break;
+			}
+		}*/
+		glm::mat4 asteroid1Scale = glm::scale(glm::vec3(0.5f));
+		glm::mat4 asteroid1Rotate = glm::rotate(timeGL * 0.01f, glm::vec3(0, 1, 0));
+		glm::mat4 asteroid1Translate = glm::translate(glm::vec3(float(positionX), float(positionY), float(positionZ)));
+		drawObjectTexture(programTex, asteroidContext, asteroid1Scale * asteroid1Rotate * asteroid1Translate, texture::sun, texture::asteroidNormal);
+	}
+	/*glm::mat4 asteroid1Scale = glm::scale(glm::vec3(0.5f));
+	glm::mat4 asteroid1Rotate = glm::rotate(time * 0.01f, glm::vec3(1, 1, 0));
+	glm::mat4 asteroid1Translate = glm::translate(glm::vec3(0, 0, 12));
+
+	glm::mat4 asteroid2Scale = glm::scale(glm::vec3(0.5f));
+	glm::mat4 asteroid2Rotate = glm::rotate(time * 0.01f, glm::vec3(1, 1, 0));
+	glm::mat4 asteroid2Translate = glm::translate(glm::vec3(2, 6, 12.2));
+
+	glm::mat4 asteroid3Scale = glm::scale(glm::vec3(0.5f));
+	glm::mat4 asteroid3Rotate = glm::rotate(time * 0.01f, glm::vec3(0, 1, 0));
+	glm::mat4 asteroid3Translate = glm::translate(glm::vec3(-2, 6, 11.6));
+
+
+	glm::mat4 asteroid4Scale = glm::scale(glm::vec3(-1.f));
+	glm::mat4 asteroid4Rotate = glm::rotate(time * 0.01f, glm::vec3(0, 1, 0));
+	glm::mat4 asteroid4Translate = glm::translate(glm::vec3(0, 3, 12));
+	glm::mat4 asteroid5Scale = glm::scale(glm::vec3(0.5f));
+	glm::mat4 asteroid5Rotate = glm::rotate(time * 0.01f, glm::vec3(0, 1, 0));
+	glm::mat4 asteroid5Translate = glm::translate(glm::vec3(5, 0, 12.4));
+		//glm::vec3 translate = glm::vec3(float(groupPositionX) + relativeX, float(groupPositionY) + relativeY, 12.0f + relativeZ);
+		drawObjectTexture(programTex, asteroidContext, asteroid1Scale * asteroid1Rotate * asteroid1Translate, texture::asteroid_grey, texture::asteroidNormal);
+		drawObjectTexture(programTex, asteroidContext, asteroid2Scale * asteroid2Rotate * asteroid2Translate, texture::asteroid_red, texture::asteroidNormal);
+		drawObjectTexture(programTex, asteroidContext, asteroid3Scale * asteroid3Rotate * asteroid3Translate, texture::sun, texture::asteroidNormal);
+		drawObjectTexture(programTex, asteroidContext, asteroid4Scale * asteroid4Rotate * asteroid4Translate, texture::earth, texture::asteroidNormal);
+		drawObjectTexture(programTex, asteroidContext, asteroid5Scale * asteroid5Rotate * asteroid5Translate, texture::aliensPlanet, texture::asteroidNormal);
+
+		*/
 
 
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
@@ -408,7 +479,7 @@ void loadModelToContext(std::string path, Core::RenderContext& context)
 
 void init(GLFWwindow* window)
 {
-	initAsteroidRendering();
+	//initAsteroidRendering();
 	glGenTextures(1, &texture::cubemap);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texture::cubemap);
 	int w, h;
@@ -453,7 +524,7 @@ void init(GLFWwindow* window)
 	programSun = shaderLoader.CreateProgram("shaders/shader_5_sun.vert", "shaders/shader_5_sun.frag");
 	programShip = shaderLoader.CreateProgram("shaders/shader_ship.vert", "shaders/shader_ship.frag");
 	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
-	programAsteroid = shaderLoader.CreateProgram("shaders/shader_asteroid.vert", "shaders/shader_asteroid.frag");
+	//programAsteroid = shaderLoader.CreateProgram("shaders/shader_asteroid.vert", "shaders/shader_asteroid.frag");
 
 	
 	loadModelToContext("./models/sphere.obj", sphereContext);
@@ -478,9 +549,9 @@ void init(GLFWwindow* window)
 	texture::clouds = Core::LoadTexture("textures/planets/8k_earth_clouds.jpg");
 	texture::earthNormal = Core::LoadTexture("textures/planets/earth2_normals.png");
 
-	texture::ship = Core::LoadTexture("textures/spaceship/spaceship.jpg");
+	texture::ship = Core::LoadTexture("textures/spaceship/SF_Fighter-Albedo.jpg");
 	texture::shipNormal = Core::LoadTexture("textures/spaceship/SF_Fighter_Normal.jpg");
-	texture::rust = Core::LoadTexture("textures/spaceship/rust.png");
+	texture::rust = Core::LoadTexture("textures/spaceship/rust.jpg");
 	texture::rustNormal = Core::LoadTexture("textures/spaceship/rust_normal.jpg");
 	texture::shipScratches = Core::LoadTexture("textures/spaceship/scratches.png");
 	
@@ -508,6 +579,8 @@ void init(GLFWwindow* window)
 
 	texture::asteroid_grey = Core::LoadTexture("textures/asteroids/4k_haumea_fictional.jpg");
 	texture::asteroid_red = Core::LoadTexture("textures/asteroids/4k_makemake_fictional.jpg");
+	texture::asteroidNormal = Core::LoadTexture("textures/asteroids/asteroid_normal.jpg");
+
 
 
 
