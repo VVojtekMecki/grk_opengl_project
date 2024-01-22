@@ -31,7 +31,7 @@ void main()
 
     vec4 cloudColor = texture(clouds, fragTexCoord);
     vec4 earthColor = texture(earth, fragTexCoord);  
-    vec3 finalColor = mix(vec3(1.0), earthColor.rgb, cloudColor.r);
+    vec3 finalColor = mix(vec3(1.0), earthColor.rgb, cloudColor.r*4);
     //outColor = vec4(finalColor, 1.0) * 5.5;
     outColor = vec4(finalColor * min(1, AMBIENT + diffuse), 1.0);
 }
