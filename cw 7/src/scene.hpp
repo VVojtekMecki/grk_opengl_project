@@ -15,7 +15,6 @@
 #include <assimp/postprocess.h>
 #include <string>
 #include <..\..\cw 7\src\SOIL\SOIL.h>
-//#include <..\..\src\SOIL\SOIL.h>
 #include <vector>
 
 
@@ -75,7 +74,6 @@ Core::Shader_Loader shaderLoader;
 Core::RenderContext shipContext;
 Core::RenderContext sphereContext;
 Core::RenderContext cubeMapContex;
-Core::RenderContext mercuryPlanetContex;
 
 glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
@@ -203,7 +201,6 @@ void renderScene(GLFWwindow* window)
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texture::cubemap);
 	Core::DrawContext(cubeMapContex);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	//glUniform1i(glGetUniformLocation(skyboxProgram, "skybox"), 0);
 
 	//sun
 	drawObjectTexture(programSun, sphereContext, glm::mat4() * glm::scale(glm::vec3(4.f)), texture::sun, texture::sun);
@@ -236,17 +233,11 @@ void renderScene(GLFWwindow* window)
 		0.,0.,0.,1.,
 		});
 
-
-	//drawObjectColor(shipContext,
-	//	glm::translate(cameraPos + 1.5 * cameraDir + cameraUp * -0.5f) * inveseCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()),
-	//	glm::vec3(0.3, 0.3, 0.5)
-	//	);
 	drawObjectTexture(programShip, shipContext,
 		glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f)),
 		texture::ship, texture::shipNormal
 	);
 
-	//glUseProgram(0);
 	glfwSwapBuffers(window);
 }
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -267,39 +258,6 @@ void loadModelToContext(std::string path, Core::RenderContext& context)
 	context.initFromAssimpMesh(scene->mMeshes[0]);
 }
 
-/*GLuint loadSkybox() {
-	std::vector<std::string> skyboxFaces = {
-"space_rt.png", "space_lf.png",
-"space_up.png", "space_dn.png",
-"space_ft.png", "space_bk.png"
-	};
-	GLuint cubemapTexture;
-	glGenTextures(1, &cubemapTexture);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-
-	int w, h;
-	unsigned char* image;
-	for (unsigned int i = 0; i < 6; i++) {
-		std::string filepath = "skybox/" + skyboxFaces[i];
-		image = SOIL_load_image(filepath.c_str(), &w, &h, 0, SOIL_LOAD_RGBA);
-		glTexImage2D(
-			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-			0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image
-		);
-	}
-
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-
-	return cubemapTexture;
-}*/
-
-
 void init(GLFWwindow* window)
 {
 
@@ -314,13 +272,6 @@ void init(GLFWwindow* window)
 	  "./textures/skybox/lightblue/bot.png",
 	  "./textures/skybox/lightblue/front.png",
 	  "./textures/skybox/lightblue/back.png",
-	  /*/textures/skybox/red/bkg1_right1.png",
-	  "./textures/skybox/red/bkg1_left2.png",
-	  "./textures/skybox/red/bkg1_top3.png",
-	  "./textures/skybox/red/bkg1_bottom4.png",
-	  "./textures/skybox/red/bkg1_front5.png",
-	  "./textures/skybox/red/bkg1_back6.png",*/
-
 	};
 	for (unsigned int i = 0; i < 6; i++)
 	{
@@ -438,8 +389,6 @@ void processInput(GLFWwindow* window)
 	cameraPos = spaceshipPos - 1.5 * spaceshipDir + glm::vec3(0, 1, 0) * 0.5f;
 	cameraDir = spaceshipDir;
 
-	//cameraDir = glm::normalize(-cameraPos);
-
 }
 
 // funkcja jest glowna petla
@@ -452,4 +401,3 @@ void renderLoop(GLFWwindow* window) {
 		glfwPollEvents();
 	}
 }
-//}
