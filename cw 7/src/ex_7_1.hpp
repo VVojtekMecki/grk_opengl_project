@@ -197,6 +197,9 @@ void renderScene(GLFWwindow* window)
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix() * glm::translate(cameraPos);
 	transformation = viewProjectionMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "transformation"), 1, GL_FALSE, (float*)&transformation);
+
+
+
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texture::cubemap);
 	Core::DrawContext(cubeMapContex);
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -218,7 +221,7 @@ void renderScene(GLFWwindow* window)
 	//haumea
 	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f)), texture::haumea, texture::haumeaNormal);
 	//mercury
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time/2) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f)), texture::mercury, texture::mercuryNormal);
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time/7) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f)), texture::mercury, texture::mercuryNormal);
 
 
 
