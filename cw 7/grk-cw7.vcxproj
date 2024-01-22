@@ -46,6 +46,8 @@
     <None Include="shaders\shader_5_1_tex_copy.vert" />
     <None Include="shaders\shader_5_sun.frag" />
     <None Include="shaders\shader_5_sun.vert" />
+    <None Include="shaders\shader_asteroid.frag" />
+    <None Include="shaders\shader_asteroid.vert" />
     <None Include="shaders\shader_earth.frag" />
     <None Include="shaders\shader_earth.vert" />
     <None Include="shaders\shader_ship.frag" />
