@@ -25,7 +25,7 @@
   <ItemGroup>
     <ClInclude Include="egor.hpp" />
     <ClInclude Include="src\Camera.h" />
-    <ClInclude Include="src\ex_7_1.hpp" />
+    <ClInclude Include="src\scene.hpp" />
     <ClInclude Include="src\objload.h" />
     <ClInclude Include="src\Render_Utils.h" />
     <ClInclude Include="src\Shader_Loader.h" />
