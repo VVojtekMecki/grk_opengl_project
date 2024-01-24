@@ -19,6 +19,9 @@
     <Filter Include="Source Files\SOIL">
       <UniqueIdentifier>{0af44075-33f4-4953-b1d6-1d28d61d758f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\objects">
+      <UniqueIdentifier>{607d94fe-f885-44a0-bc53-94c206b16c59}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Render_Utils.cpp">
@@ -50,6 +53,9 @@
     </ClCompile>
     <ClCompile Include="src\SOIL\image_helper.c">
       <Filter>Source Files\SOIL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\space_objects.cpp">
+      <Filter>Header Files\objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -88,9 +94,6 @@
     </ClInclude>
     <ClInclude Include="src\scene.hpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="egor.hpp">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
