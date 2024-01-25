@@ -57,6 +57,9 @@
     <ClCompile Include="src\space_objects.cpp">
       <Filter>Header Files\objects</Filter>
     </ClCompile>
+    <ClCompile Include="src\planets_list.cpp">
+      <Filter>Header Files\objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\objload.h">

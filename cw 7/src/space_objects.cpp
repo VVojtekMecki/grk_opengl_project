@@ -49,9 +49,13 @@ class Planet : public SpaceObject {
 	//float getZ() const override { return z; }
 };
 
-class Earth : public Planet {
+class CloudedPlanet : public Planet {
+private:
+	GLuint clouds;
 
-	GLuint clouds = Core::LoadTexture("textures/planets/8k_earth_clouds.jpg");
+public:
+	CloudedPlanet(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint texture, GLuint normals, GLuint clouds)
+		: Planet(program, context, modelMatrix, texture, normals), clouds(clouds) {}
 
 	void drawObjectTexture(glm::mat4 viewProjectionMatrix) const override {
 		glUseProgram(program);
@@ -76,7 +80,7 @@ class Sun : public SpaceObject {
 		glm::mat4 modelMatrix;
 
 	public: 
-		Sun(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint texture, GLuint normals)
+		Sun(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint texture)
 		: program(program), context(context), modelMatrix(modelMatrix), texture(texture) {}
 
 		void drawObjectTexture(glm::mat4 viewProjectionMatrix) const override {
