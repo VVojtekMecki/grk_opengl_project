@@ -17,12 +17,20 @@
 class SpaceObject {
 	public:
 		virtual ~SpaceObject() = default;
-		virtual void drawObjectTexture(glm::mat4 viewProjectionMatrix) const = 0;
+		virtual void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const = 0;
+		virtual std::string getName() const = 0;
+		virtual GLuint getTexture() const = 0;
+		virtual GLuint getNormals() const = 0;
+		virtual GLuint getProgram() const = 0;
+		virtual Core::RenderContext& getContext() const = 0;
+		virtual glm::mat4 getModelMatrix() const = 0;
+		virtual float getTime(float time) { return time; };
 };
 
 
 class Planet : public SpaceObject {
 	public:
+		std::string name;
 		GLuint texture;
 		GLuint normals;
 		GLuint program;
@@ -30,9 +38,9 @@ class Planet : public SpaceObject {
 		glm::mat4 modelMatrix;
 
 	public:
-		Planet(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint texture, GLuint normals) 
-			: program(program), context(context), modelMatrix(modelMatrix), texture(texture), normals(normals) {}
-		void drawObjectTexture(glm::mat4 viewProjectionMatrix) const override {
+		Planet(std::string name, GLuint program, Core::RenderContext& context, GLuint texture, GLuint normals)
+			: program(program), context(context), texture(texture), normals(normals), name(name) {}
+		void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const override {
 			glUseProgram(program);
 			glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 			glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
@@ -44,9 +52,12 @@ class Planet : public SpaceObject {
 			Core::DrawContext(context);
 			glUseProgram(0);
 		}
-	//float getX() const override { return x; }
-	//float getY() const override { return y; }
-	//float getZ() const override { return z; }
+		GLuint getTexture() const override { return this->texture; };
+		GLuint getNormals() const override { return this->normals; };
+		GLuint getProgram() const override { return this->program; };
+		Core::RenderContext& getContext() const override { return this->context; };
+		glm::mat4 getModelMatrix() const override { return this->modelMatrix; };
+		std::string getName() const override { return this->name; };
 };
 
 class CloudedPlanet : public Planet {
@@ -54,10 +65,10 @@ private:
 	GLuint clouds;
 
 public:
-	CloudedPlanet(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint texture, GLuint normals, GLuint clouds)
-		: Planet(program, context, modelMatrix, texture, normals), clouds(clouds) {}
+	CloudedPlanet(std::string name, GLuint program, Core::RenderContext& context, GLuint texture, GLuint normals, GLuint clouds)
+		: Planet(name, program, context, texture, normals), clouds(clouds) {}
 
-	void drawObjectTexture(glm::mat4 viewProjectionMatrix) const override {
+	void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const override {
 		glUseProgram(program);
 		glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 		glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
@@ -70,20 +81,26 @@ public:
 		Core::DrawContext(context);
 		glUseProgram(0);
 	}
+	GLuint getTexture() const override { return this->texture; };
+	GLuint getNormals() const override { return this->normals; };
+	GLuint getProgram() const override { return this->program; };
+	Core::RenderContext& getContext() const override { return this->context; };
+	glm::mat4 getModelMatrix() const override { return this->modelMatrix; };
 };
 
 class Sun : public SpaceObject {
 	public:
+		std::string name;
 		GLuint texture;
 		GLuint program;
 		Core::RenderContext& context;
 		glm::mat4 modelMatrix;
 
 	public: 
-		Sun(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint texture)
-		: program(program), context(context), modelMatrix(modelMatrix), texture(texture) {}
+		Sun(std::string name, GLuint program, Core::RenderContext& context, GLuint texture)
+		: program(program), context(context), texture(texture), name(name) {}
 
-		void drawObjectTexture(glm::mat4 viewProjectionMatrix) const override {
+		void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const override {
 			glUseProgram(program);
 			glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 			glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
@@ -94,6 +111,12 @@ class Sun : public SpaceObject {
 			Core::DrawContext(context);
 			glUseProgram(0);
 		}
+		GLuint getTexture() const override { return this->texture; };
+		GLuint getNormals() const override { return NULL; };
+		GLuint getProgram() const override { return this->program; };
+		Core::RenderContext& getContext() const override { return this->context; };
+		glm::mat4 getModelMatrix() const override { return this->modelMatrix; };
+		std::string getName() const override { return this->name; };
 };
 
 class Ship : public SpaceObject {
@@ -102,6 +125,7 @@ class Ship : public SpaceObject {
 	GLuint shipScratches = Core::LoadTexture("textures/spaceship/scratches.png");
 
 	public:
+		std::string name;
 		GLuint texture;
 		GLuint normals;
 		GLuint program;
@@ -109,10 +133,10 @@ class Ship : public SpaceObject {
 		glm::mat4 modelMatrix;
 
 	public:
-		Ship(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint texture, GLuint normals)
-			: program(program), context(context), modelMatrix(modelMatrix), texture(texture), normals(normals) {}
+		Ship(std::string name, GLuint program, Core::RenderContext& context, GLuint texture, GLuint normals)
+			: program(program), context(context), texture(texture), normals(normals), name(name) {}
 
-		void drawObjectTexture(glm::mat4 viewProjectionMatrix) const override {
+		void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const override {
 			glUseProgram(program);
 			glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 			glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
@@ -126,5 +150,11 @@ class Ship : public SpaceObject {
 			Core::DrawContext(context);
 			glUseProgram(0);
 		}
+		GLuint getTexture() const override { return this->texture; };
+		GLuint getNormals() const override { return this->normals; };
+		GLuint getProgram() const override { return this->program; };
+		Core::RenderContext& getContext() const override { return this->context; };
+		glm::mat4 getModelMatrix() const override { return this->modelMatrix; };
+		std::string getName() const override { return this->name; };
 };
 

@@ -16,33 +16,10 @@
 #include <string>
 #include <..\..\cw 7\src\SOIL\SOIL.h>
 #include <vector>
+#include "planets_list.cpp"
 
 
 namespace texture {
-	GLuint earth;
-	GLuint clouds;
-
-	GLuint mercury;
-	GLuint mercuryNormal;
-
-	GLuint aliensPlanet;
-	GLuint aliensPlanetNormal;
-	GLuint aliensPlanetClouds;
-
-	GLuint venus;
-	GLuint venusNormal;
-	
-	GLuint mars;
-	GLuint marsNormal;
-
-	GLuint jupiter;
-	GLuint jupiterNormal;
-	
-	GLuint haumea;
-	GLuint haumeaNormal;
-
-
-	
 
 	GLuint ship;
 	GLuint rust;
@@ -52,7 +29,6 @@ namespace texture {
 	GLuint cubemap;
 
 	GLuint shipScratches;
-	GLuint earthNormal;
 	GLuint shipNormal;
 	GLuint moonNormal;
 	GLuint rustNormal;
@@ -62,17 +38,17 @@ namespace texture {
 
 
 GLuint program;
-GLuint programSun;
-GLuint programTex;
-GLuint programEarth;
-GLuint programProcTex;
+//GLuint programSun;
+//GLuint programTex;
+//GLuint programEarth;
+//GLuint programProcTex;
 GLuint programShip;
 GLuint programSkybox;
 
 Core::Shader_Loader shaderLoader;
 
 Core::RenderContext shipContext;
-Core::RenderContext sphereContext;
+//Core::RenderContext sphereContext;
 Core::RenderContext cubeMapContex;
 
 glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
@@ -86,6 +62,8 @@ float aspectRatio = 1.f;
 
 float lastFrameTime = 0.0f;
 float deltaTime = 0.0f;
+
+
 
 glm::mat4 createCameraMatrix()
 {
@@ -108,7 +86,7 @@ glm::mat4 createPerspectiveMatrix()
 	
 	glm::mat4 perspectiveMatrix;
 	float n = 0.05;
-	float f = 20.;
+	float f = 1000.;
 	float a1 = glm::min(aspectRatio, 1.f);
 	float a2 = glm::min(1 / aspectRatio, 1.f);
 	perspectiveMatrix = glm::mat4({
@@ -124,6 +102,8 @@ glm::mat4 createPerspectiveMatrix()
 	return perspectiveMatrix;
 }
 
+SpaceObjectsList spaceObjectsList(glfwGetTime(), createPerspectiveMatrix()* createCameraMatrix());
+
 void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
 	glUseProgram(program);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
@@ -131,36 +111,11 @@ void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 m
 	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
 
-	if (textureID == texture::sun) {
-		Core::SetActiveTexture(texture::sun , "tex", program, 0);
-	}
-	else if (textureID == texture::earth) {
-		Core::SetActiveTexture(textureID, "earth", program, 0);
-		Core::SetActiveTexture(texture::clouds, "clouds", program, 1);
-		Core::SetActiveTexture(normalmapId, "normalSampler", program, 2);
-	}
-	else if (textureID == texture::moon) {
-		Core::SetActiveTexture(textureID, "tex", program, 0);
-		Core::SetActiveTexture(normalmapId, "normalSampler", program, 1);
-
-
-	}
-	else if (textureID == texture::ship) {
+	if (textureID == texture::ship) {
 		Core::SetActiveTexture(texture::ship, "ship", program, 0);
 		Core::SetActiveTexture(texture::rust, "rust", program, 1);
 		Core::SetActiveTexture(texture::shipScratches, "asteroid", program, 2);
 		Core::SetActiveTexture(normalmapId, "normalSampler", program, 3);
-
-
-	}
-	else if (textureID == texture::aliensPlanet) {
-		Core::SetActiveTexture(textureID, "earth", program, 0);
-		Core::SetActiveTexture(texture::clouds, "clouds", program, 1);
-		Core::SetActiveTexture(normalmapId, "normalSampler", program, 2);
-	}
-	else {
-		Core::SetActiveTexture(textureID, "tex", program, 0);
-		Core::SetActiveTexture(normalmapId, "normalSampler", program, 1);
 	}
 
 	Core::DrawContext(context);
@@ -178,6 +133,8 @@ void renderScene(GLFWwindow* window)
 	deltaTime = glm::min(deltaTime, 0.1f);
 	lastFrameTime = time;
 
+	spaceObjectsList.updateTime(time);
+
 
 	glUseProgram(programSkybox);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix() * glm::translate(cameraPos);
@@ -190,27 +147,22 @@ void renderScene(GLFWwindow* window)
 	Core::DrawContext(cubeMapContex);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	//sun
-	drawObjectTexture(programSun, sphereContext, glm::mat4() * glm::scale(glm::vec3(4.f)), texture::sun, texture::sun);
-	//earth
-	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)), texture::earth, texture::earthNormal);
-	//moon
-	drawObjectTexture(programTex, sphereContext,
-		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)), texture::moon, texture::moonNormal);
-	//mars
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY((time +6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f)), texture::mars, texture::marsNormal);
-	//aliens planet
-	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(time/3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f)), texture::aliensPlanet, texture::aliensPlanetNormal);
-	//venus
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f)), texture::venus, texture::venusNormal);
-	//haumea
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f)), texture::haumea, texture::haumeaNormal);
-	//mercury
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time/7) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f)), texture::mercury, texture::mercuryNormal);
+	std::map<std::string, glm::mat4> modelMatrixMap = {
+		{ "sun", glm::mat4() * glm::scale(glm::vec3(4.f)) },
+		{ "earth", glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
+		{ "moon", glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)) },
+		{ "mars", glm::eulerAngleY((time + 6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f))},
+		{ "aliensPlanet", glm::eulerAngleY(time / 3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f))},
+		{ "venus", glm::eulerAngleY(time / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
+		{ "humea", glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f))},
+		{ "mercury", glm::eulerAngleY(time / 7) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f))}
+	};
 
+	glm::mat4 projectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 
-
-
+	for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
+		obj.object->drawObjectTexture(projectionMatrix, modelMatrixMap.at(obj.name));
+	}
 
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::normalize(glm::cross(spaceshipSide, spaceshipDir));
@@ -228,11 +180,13 @@ void renderScene(GLFWwindow* window)
 
 	glfwSwapBuffers(window);
 }
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	aspectRatio = width / float(height);
 	glViewport(0, 0, width, height);
 }
+
 void loadModelToContext(std::string path, Core::RenderContext& context)
 {
 	Assimp::Importer import;
@@ -280,66 +234,20 @@ void init(GLFWwindow* window)
 
 	glEnable(GL_DEPTH_TEST);
 	program = shaderLoader.CreateProgram("shaders/shader_5_1.vert", "shaders/shader_5_1.frag");
-	programTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex_copy.vert", "shaders/shader_5_1_tex_copy.frag");
-	programEarth = shaderLoader.CreateProgram("shaders/shader_earth.vert", "shaders/shader_earth.frag");
-	programProcTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex.vert", "shaders/shader_5_1_tex.frag");
-	programSun = shaderLoader.CreateProgram("shaders/shader_5_sun.vert", "shaders/shader_5_sun.frag");
 	programShip = shaderLoader.CreateProgram("shaders/shader_ship.vert", "shaders/shader_ship.frag");
 	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
 	
-	loadModelToContext("./models/sphere.obj", sphereContext);
 	loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
-	//loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 	loadModelToContext("./models/cube.obj", cubeMapContex);
-
-	
-
-
-	//new objects
-
-
-
-	//texture::skybox = loadSkybox();
-
-	texture::sun = Core::LoadTexture("textures/planets/8k_sun.jpg");
-
-	texture::earth = Core::LoadTexture("textures/planets/8k_earth_daymap.jpg");
-	texture::clouds = Core::LoadTexture("textures/planets/8k_earth_clouds.jpg");
-	texture::earthNormal = Core::LoadTexture("textures/planets/earth2_normals.png");
 
 	texture::ship = Core::LoadTexture("textures/spaceship/spaceship.jpg");
 	texture::shipNormal = Core::LoadTexture("textures/spaceship/SF_Fighter_Normal.jpg");
 	texture::rust = Core::LoadTexture("textures/spaceship/rust.png");
 	texture::rustNormal = Core::LoadTexture("textures/spaceship/rust_normal.jpg");
 	texture::shipScratches = Core::LoadTexture("textures/spaceship/scratches.png");
-	
-	texture::moon = Core::LoadTexture("textures/planets/8k_moon.jpg");
+
 	texture::moonNormal = Core::LoadTexture("textures/planets/moon_normal.jpg");
-
-	texture::mercury = Core::LoadTexture("textures/planets/mercury.png");
-	texture::mercuryNormal = Core::LoadTexture("textures/planets/mercury_normal.jpg");
-
-	texture::aliensPlanet = Core::LoadTexture("textures/planets/aliensPlanet.png");
-	texture::aliensPlanetNormal = Core::LoadTexture("textures/planets/aliensPlanet_normal.jpg");
-	texture::aliensPlanetClouds = Core::LoadTexture("textures/planets/aliensPlanet_clouds.jpg");
-
-	texture::venus = Core::LoadTexture("textures/planets/venus.jpg");
-	texture::venusNormal = Core::LoadTexture("textures/planets/venus_normal.jpg");
-
-	texture::mars = Core::LoadTexture("textures/planets/mars.jpg");
-	texture::marsNormal = Core::LoadTexture("textures/planets/mars_normal.jpg");
-
-	texture::jupiter = Core::LoadTexture("textures/planets/jupiter.jpg");
-	texture::jupiterNormal = Core::LoadTexture("textures/planets/jupiter_normal.jpg");
-	
-	texture::haumea = Core::LoadTexture("textures/planets/haumea.jpg");
-	texture::haumeaNormal = Core::LoadTexture("textures/planets/haumea_normal.jpg");
-
-
-
-
-
-
+	spaceObjectsList.init();
 }
 
 void shutdown(GLFWwindow* window)
