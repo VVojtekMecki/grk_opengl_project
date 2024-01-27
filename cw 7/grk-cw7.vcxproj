@@ -28,6 +28,7 @@
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\objects\ship.h" />
+    <ClInclude Include="src\objects\skybox.h" />
     <ClInclude Include="src\scene.hpp" />
     <ClInclude Include="src\objload.h" />
     <ClInclude Include="src\Render_Utils.h" />

@@ -104,6 +104,9 @@
     <ClInclude Include="src\objects\ship.h">
       <Filter>Header Files\objects</Filter>
     </ClInclude>
+    <ClInclude Include="src\objects\skybox.h">
+      <Filter>Header Files\objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader_5_sun.frag">

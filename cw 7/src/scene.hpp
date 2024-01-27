@@ -18,19 +18,11 @@
 #include <vector>
 #include "objects/planets_list.cpp"
 #include "objects/player_ship.cpp"
-
-
-namespace texture {
-	GLuint cubemap;
-	GLuint skybox;
-}
+#include "objects/skybox.h"
 
 GLuint program;
-GLuint programSkybox;
 
 Core::Shader_Loader shaderLoader;
-
-Core::RenderContext cubeMapContex;
 
 glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
@@ -43,8 +35,6 @@ float aspectRatio = 1.f;
 
 float lastFrameTime = 0.0f;
 float deltaTime = 0.0f;
-
-
 
 glm::mat4 createCameraMatrix()
 {
@@ -87,6 +77,8 @@ SpaceObjectsList spaceObjectsList(glfwGetTime(), createPerspectiveMatrix()* crea
 
 PlayerShip player;
 
+Skybox skybox;
+
 void renderScene(GLFWwindow* window)
 {
 
@@ -98,18 +90,14 @@ void renderScene(GLFWwindow* window)
 	deltaTime = glm::min(deltaTime, 0.1f);
 	lastFrameTime = time;
 
-	spaceObjectsList.updateTime(time);
+	//spaceObjectsList.updateTime(time);
+	
 
-
-	glUseProgram(programSkybox);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix() * glm::translate(cameraPos);
 	transformation = viewProjectionMatrix;
-	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	skybox.renderSkybox(transformation);
 
 
-
-	glBindTexture(GL_TEXTURE_CUBE_MAP, texture::cubemap);
-	Core::DrawContext(cubeMapContex);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	std::map<std::string, glm::mat4> modelMatrixMap = {
@@ -166,41 +154,12 @@ void loadModelToContext(std::string path, Core::RenderContext& context)
 
 void init(GLFWwindow* window)
 {
-
-	glGenTextures(1, &texture::cubemap);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, texture::cubemap);
-	int w, h;
-	unsigned char* data;
-	std::vector<std::string> filepaths = {
-	 "./textures/skybox/lightblue/right.png",
-	  "./textures/skybox/lightblue/left.png",
-	  "./textures/skybox/lightblue/top.png",
-	  "./textures/skybox/lightblue/bot.png",
-	  "./textures/skybox/lightblue/front.png",
-	  "./textures/skybox/lightblue/back.png",
-	};
-	for (unsigned int i = 0; i < 6; i++)
-	{
-		unsigned char* image = SOIL_load_image(filepaths[i].c_str(), &w, &h, 0, SOIL_LOAD_RGBA);
-		glTexImage2D(
-			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-			0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image
-		);
-
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	}
+	skybox.init();
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	glEnable(GL_DEPTH_TEST);
 	program = shaderLoader.CreateProgram("shaders/shader_5_1.vert", "shaders/shader_5_1.frag");
-	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
-	
-	loadModelToContext("./models/cube.obj", cubeMapContex);
 
 	spaceObjectsList.init();
 	player.init();
@@ -211,7 +170,6 @@ void shutdown(GLFWwindow* window)
 	shaderLoader.DeleteProgram(program);
 }
 
-//obsluga wejscia
 void processInput(GLFWwindow* window)
 {
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
@@ -243,7 +201,6 @@ void processInput(GLFWwindow* window)
 
 }
 
-// funkcja jest glowna petla
 void renderLoop(GLFWwindow* window) {
 	while (!glfwWindowShouldClose(window))
 	{

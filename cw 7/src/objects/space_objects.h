@@ -1,14 +1,4 @@
-#include "glew.h"
-#include <GLFW/glfw3.h>
-#include "glm.hpp"
-#include "ext.hpp"
-#include <iostream>
-#include <cmath>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 #include <string>
-#include <..\..\cw 7\src\SOIL\SOIL.h>
 #include <vector>
 #include "../Shader_Loader.h"
 #include "../Render_Utils.h"
