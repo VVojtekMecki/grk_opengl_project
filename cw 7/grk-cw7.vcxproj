@@ -14,16 +14,17 @@
     <ClCompile Include="src\Box.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\planets_list.cpp" />
     <ClCompile Include="src\Render_Utils.cpp" />
     <ClCompile Include="src\Shader_Loader.cpp" />
     <ClCompile Include="src\SOIL\image_DXT.c" />
     <ClCompile Include="src\SOIL\image_helper.c" />
     <ClCompile Include="src\SOIL\SOIL.c" />
     <ClCompile Include="src\SOIL\stb_image_aug.c" />
+    <ClCompile Include="src\space_objects.cpp" />
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="egor.hpp" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\scene.hpp" />
     <ClInclude Include="src\objload.h" />
