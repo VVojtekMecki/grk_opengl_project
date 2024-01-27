@@ -300,12 +300,12 @@ void renderScene(GLFWwindow* window)
 
 
 	//ship to repair
-	drawObjectTexture(programTex, shipToRepairContext, /*glm::eulerAngleY(time / 7) **/ shipRepairMatrix * glm::scale(glm::vec3(0.1f)), texture::shipRepair, texture::shipRepairNormal);
+	drawObjectTexture(programTex, shipToRepairContext, shipRepairMatrix * glm::scale(glm::vec3(0.1f)), texture::shipRepair, texture::shipRepairNormal);
 
 	
 	//ship
 	drawObjectTexture(programShip, shipContext,
-		shipMatrix/*glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) */* glm::scale(glm::vec3(0.04f)),
+		shipMatrix* glm::scale(glm::vec3(0.04f)),
 		texture::ship, texture::shipNormal
 	);
 
@@ -325,14 +325,11 @@ void renderScene(GLFWwindow* window)
 		if (glm::distance(shipTranslationVec, engineDetailTranslationVec) < 1.0f && !isDragging)
 		{
 			canPickUpEngine = true;
-			/*canPickUpCrew = !isObjectPickedUp;
-			canPickUpKit = !isObjectPickedUp;*/
 		}
 	if (isPKeyPressed && canPickUpEngine) {
 		isObjectPickedUp = true;
 		isDragging = true;
 
-		//std::cout << "HIIIGH!!!   " << "R pressed" << isRKeyPressed << ' ' << "P pressed" << isPKeyPressed << std::endl;
 		engineDetailMatrix = glm::translate(spaceshipPosCOPY);
 		float dist = glm::distance(shipTranslationVec, shipRepairTranslationVec);
 
@@ -342,11 +339,9 @@ void renderScene(GLFWwindow* window)
 		else {
 			isEngineCloseToShipRepair = false;
 		}
-		//isObjectPickedUp = engine
+		//isObjectPickedUp - about engine
 		if (isRKeyPressed && isObjectPickedUp && isEngineCloseToShipRepair) {
 			drawSpaceshipEngine = false;
-			//std::cout << "Inside isRKeyPressed condition" << std::endl;
-			//std::cout << "engine After reset - R: " << isRKeyPressed << ", P: " << isPKeyPressed << std::endl;
 
 			isPKeyPressed = false;
 			isRKeyPressed = false;
@@ -355,15 +350,7 @@ void renderScene(GLFWwindow* window)
 			isObjectPickedUp = false;
 
 			isDragging = false;
-			//isEngineCloseToShipRepair = false;
 
-			//canPickUpCrew = false;
-			/*isCrewPickedUp = false;
-			isCrewCloseToShipRepair = false;*/
-
-			//canPickUpKit = false;
-			/*isKitPickedUp = false;
-			isKitCloseToShipRepair = false;*/
 
 		}
 	}
@@ -378,14 +365,11 @@ void renderScene(GLFWwindow* window)
 	if (glm::distance(shipTranslationVec, kitDetailTranslationVec) < 1.0f && !isDragging)
 	{
 		canPickUpKit = true;
-		/*canPickUpCrew = !isKitPickedUp;
-		canPickUpEngine = !isKitPickedUp;*/
 	}
 	if (isPKeyPressed && canPickUpKit) {
 		isKitPickedUp = true;
 		isDragging = true;
 		kitMatrix = glm::translate(spaceshipPosCOPY);
-		//float dist = glm::distance(shipTranslationVec, shipRepairTranslationVec);
 		if (glm::distance(shipTranslationVec, shipRepairTranslationVec) < 3.f) {
 			isKitCloseToShipRepair = true;
 		}
@@ -397,25 +381,15 @@ void renderScene(GLFWwindow* window)
 			isPKeyPressed = false;
 			isRKeyPressed = false;
 
-			//canPickUpEngine = false;
-			/*isObjectPickedUp = false;
-			isEngineCloseToShipRepair = false;*/
-
-			//canPickUpCrew = false;
-			/*isCrewPickedUp = false;
-			isCrewCloseToShipRepair = false;*/
-
 			canPickUpKit = false;
 			isKitPickedUp = false;
 			isDragging = false;
-			//isKitCloseToShipRepair = false;
 
 
-			//std::cout << "kit After reset - R: " << isRKeyPressed << ", P: " << isPKeyPressed << std::endl;
 		}
 	}
 	if (drawSpaceshipKit) {
-		drawObjectTexture(programTex, firstAidBoxContext, /*glm::eulerAngleY(14.f)* glm::eulerAngleY(90.f) * kitMatrix*/ kitMatrix* /*glm::translate(glm::vec3(3.f, 0, 0)) *  */ glm::scale(glm::vec3(0.06f)), texture::firstAidKit, texture::firstAidKitNormal);
+		drawObjectTexture(programTex, firstAidBoxContext, kitMatrix * glm::scale(glm::vec3(0.06f)), texture::firstAidKit, texture::firstAidKitNormal);
 	}
 	
 
@@ -427,15 +401,12 @@ void renderScene(GLFWwindow* window)
 	if (glm::distance(shipTranslationVec, crewDetailTranslationVec) < 1.0f&& !isDragging)
 	{
 		canPickUpCrew = true;
-		/*canPickUpEngine = !canPickUpCrew;
-		canPickUpKit = !canPickUpCrew;*/
+		
 	}
 	if (isPKeyPressed && canPickUpCrew) {
-		//spaceshipPosCOPY.y = spaceshipPosCOPY.y - 0.2f;
 		isCrewPickedUp = true;
 		isDragging = true;
 		crewMemberMatrix = glm::translate(spaceshipPosCOPY);
-		//float dist = glm::distance(shipTranslationVec, shipRepairTranslationVec);
 		if (glm::distance(shipTranslationVec, shipRepairTranslationVec) < 3.f && !isObjectPickedUp && !isKitPickedUp) {
 			isCrewCloseToShipRepair = true;
 		}
@@ -447,28 +418,15 @@ void renderScene(GLFWwindow* window)
 			isPKeyPressed = false;
 			isRKeyPressed = false;
 
-			//canPickUpEngine = false;
-			/*isObjectPickedUp = false;
-			isEngineCloseToShipRepair = false;*/
-
 			canPickUpCrew = false;
 			isCrewPickedUp = false;
 			isDragging = false;
-			//isCrewCloseToShipRepair = false;
 
-			//canPickUpKit = false;
-			/*isKitPickedUp = false;
-			isKitCloseToShipRepair = false;*/
-			//std::cout << "kit After reset - R: " << isRKeyPressed << ", P: " << isPKeyPressed << std::endl;
 		}
 	}
 	if (drawSpaceshipCrew) {
-		drawObjectTexture(programTex, crewMemberContext, /*glm::eulerAngleY(14.f)* glm::eulerAngleY(90.f) * kitMatrix*/crewMemberMatrix*glm::scale(glm::vec3(0.05f)), texture::crewMember, texture::crewMemberNormal);
+		drawObjectTexture(programTex, crewMemberContext, crewMemberMatrix*glm::scale(glm::vec3(0.05f)), texture::crewMember, texture::crewMemberNormal);
 	}
-
-
-
-
 
 
 	glfwSwapBuffers(window);
@@ -658,13 +616,13 @@ void processInput(GLFWwindow* window)
 	if ((glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)&&(canPickUpEngine||canPickUpKit||canPickUpCrew))
 	{
 		isPKeyPressed = true;
-		std::cout << "iside input: P    canPickUpEngine " << canPickUpEngine << "	canPickUpKit " << canPickUpKit<< "	canPickUpCrew " << canPickUpCrew << std::endl;
+		//std::cout << "iside input: P    canPickUpEngine " << canPickUpEngine << "	canPickUpKit " << canPickUpKit<< "	canPickUpCrew " << canPickUpCrew << std::endl;
 	}
 	
 	if ((glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) && (isKitPickedUp||isObjectPickedUp||isCrewPickedUp) && (isKitCloseToShipRepair || isEngineCloseToShipRepair||isCrewCloseToShipRepair))
 	{
 		isRKeyPressed = true;
-		std::cout << "iside input: R   " << isRKeyPressed << std::endl;
+		//std::cout << "iside input: R   " << isRKeyPressed << std::endl;
 
 	}
 	
