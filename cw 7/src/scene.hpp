@@ -36,6 +36,8 @@ float aspectRatio = 1.f;
 float lastFrameTime = 0.0f;
 float deltaTime = 0.0f;
 
+
+
 glm::mat4 createCameraMatrix()
 {
 	glm::vec3 cameraSide = glm::normalize(glm::cross(cameraDir,glm::vec3(0.f,1.f,0.f)));

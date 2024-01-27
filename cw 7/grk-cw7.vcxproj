@@ -23,6 +23,7 @@
     <ClCompile Include="src\SOIL\image_helper.c" />
     <ClCompile Include="src\SOIL\SOIL.c" />
     <ClCompile Include="src\SOIL\stb_image_aug.c" />
+    <ClCompile Include="src\space_objects.cpp" />
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
