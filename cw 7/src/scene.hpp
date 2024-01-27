@@ -31,21 +31,29 @@ namespace texture {
 
 	GLuint venus;
 	GLuint venusNormal;
-	
+
 	GLuint mars;
 	GLuint marsNormal;
 
 	GLuint jupiter;
 	GLuint jupiterNormal;
-	
+
 	GLuint haumea;
 	GLuint haumeaNormal;
 
 
-	
+
 
 	GLuint ship;
 	GLuint rust;
+
+	GLuint shipRepair;
+	GLuint shipRepairNormal;
+	GLuint engineDetail;
+	GLuint engineDetailNormal;
+	GLuint firstAidKit;
+	GLuint firstAidKitNormal;
+
 
 	GLuint moon;
 	GLuint sun;
@@ -74,23 +82,50 @@ Core::Shader_Loader shaderLoader;
 Core::RenderContext shipContext;
 Core::RenderContext sphereContext;
 Core::RenderContext cubeMapContex;
+Core::RenderContext spaceshipEngineDetailContext;
+Core::RenderContext shipToRepairContext;
+Core::RenderContext firstAidBoxContext;
+
 
 glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
 
 glm::vec3 spaceshipPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 spaceshipDir = glm::vec3(1.f, 0.f, 0.f);
-GLuint VAO,VBO;
+GLuint VAO, VBO;
+
+bool isShifWtPressed=false;
+bool isPKeyPressed = false;
+bool canPickUpEngine = false;
+bool canPickUpKit = false;
+bool isRKeyPressed = false;
+bool drawSpaceshipEngine = true;
+bool drawSpaceshipKit = true;
+
+bool isObjectPickedUp=false;
+bool isKitPickedUp =false;
+
+bool isEngineCloseToShipRepair = false;
+bool isKitCloseToShipRepair = false;
+
+
 
 float aspectRatio = 1.f;
 
 float lastFrameTime = 0.0f;
 float deltaTime = 0.0f;
 
+glm::mat4 engineDetailMatrix;
+glm::mat4 shipRepairMatrix;
+glm::mat4 shipMatrix;
+glm::mat4 kitMatrix;
+
+
+
 glm::mat4 createCameraMatrix()
 {
-	glm::vec3 cameraSide = glm::normalize(glm::cross(cameraDir,glm::vec3(0.f,1.f,0.f)));
-	glm::vec3 cameraUp = glm::normalize(glm::cross(cameraSide,cameraDir));
+	glm::vec3 cameraSide = glm::normalize(glm::cross(cameraDir, glm::vec3(0.f, 1.f, 0.f)));
+	glm::vec3 cameraUp = glm::normalize(glm::cross(cameraSide, cameraDir));
 	glm::mat4 cameraRotrationMatrix = glm::mat4({
 		cameraSide.x,cameraSide.y,cameraSide.z,0,
 		cameraUp.x,cameraUp.y,cameraUp.z ,0,
@@ -105,21 +140,21 @@ glm::mat4 createCameraMatrix()
 
 glm::mat4 createPerspectiveMatrix()
 {
-	
+
 	glm::mat4 perspectiveMatrix;
 	float n = 0.05;
-	float f = 20.;
+	float f = 1000.;
 	float a1 = glm::min(aspectRatio, 1.f);
 	float a2 = glm::min(1 / aspectRatio, 1.f);
 	perspectiveMatrix = glm::mat4({
 		1,0.,0.,0.,
 		0.,aspectRatio,0.,0.,
-		0.,0.,(f+n) / (n - f),2*f * n / (n - f),
+		0.,0.,(f + n) / (n - f),2 * f * n / (n - f),
 		0.,0.,-1.,0.,
 		});
 
-	
-	perspectiveMatrix=glm::transpose(perspectiveMatrix);
+
+	perspectiveMatrix = glm::transpose(perspectiveMatrix);
 
 	return perspectiveMatrix;
 }
@@ -132,10 +167,49 @@ void drawObjectColor(Core::RenderContext& context, glm::mat4 modelMatrix, glm::v
 	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
 	glUniform3f(glGetUniformLocation(program, "color"), color.x, color.y, color.z);
-	glUniform3f(glGetUniformLocation(program, "lightPos"), 0,0,0);
+	glUniform3f(glGetUniformLocation(program, "lightPos"), 0, 0, 0);
 	Core::DrawContext(context);
 
 }
+//struct BlueSphere {
+//	glm::vec3 position;
+//	glm::vec3 velocity;
+//	glm::vec3 color;
+//};
+//
+//// Vector to store all the blue spheres
+//std::vector<BlueSphere> blueSpheres;
+//
+//// Function to add a new blue sphere
+//void createBlueSphere() {
+//	BlueSphere blueSphere;
+//	blueSphere.position = spaceshipPos + spaceshipDir * 2.0f; // Initial position near the spaceship
+//	blueSphere.velocity = glm::normalize(glm::vec3(rand() % 100 - 50, rand() % 100 - 50, rand() % 100 - 50)); // Random velocity
+//	blueSphere.color = glm::vec3(0.0f, 0.0f, 1.0f); // Blue color
+//	blueSpheres.push_back(blueSphere);
+//}
+//
+//// Function to update and render blue spheres
+//void updateAndRenderBlueSpheres() {
+//	for (auto& blueSphere : blueSpheres) {
+//		// Update position based on velocity
+//		blueSphere.position += blueSphere.velocity * deltaTime;
+//
+//		// Render the blue sphere
+//		drawObjectColor(sphereContext, glm::translate(blueSphere.position) * glm::scale(glm::vec3(0.8f)), blueSphere.color);
+//	}
+//
+//	// Remove blue spheres that are too far away to improve performance
+//	blueSpheres.erase(
+//		std::remove_if(
+//			blueSpheres.begin(),
+//			blueSpheres.end(),
+//			[](const BlueSphere& sphere) {
+//				return glm::length(sphere.position - spaceshipPos) > 50.0f;
+//			}),
+//		blueSpheres.end());
+//}
+
 void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
 	glUseProgram(program);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
@@ -144,7 +218,7 @@ void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 m
 	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
 
 	if (textureID == texture::sun) {
-		Core::SetActiveTexture(texture::sun , "tex", program, 0);
+		Core::SetActiveTexture(texture::sun, "tex", program, 0);
 	}
 	else if (textureID == texture::earth) {
 		Core::SetActiveTexture(textureID, "earth", program, 0);
@@ -179,6 +253,7 @@ void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 m
 	glUseProgram(0);
 }
 
+
 void renderScene(GLFWwindow* window)
 {
 
@@ -202,28 +277,22 @@ void renderScene(GLFWwindow* window)
 	Core::DrawContext(cubeMapContex);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	//sun
-	drawObjectTexture(programSun, sphereContext, glm::mat4() * glm::scale(glm::vec3(4.f)), texture::sun, texture::sun);
-	//earth
-	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)), texture::earth, texture::earthNormal);
-	//moon
-	drawObjectTexture(programTex, sphereContext,
-		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)), texture::moon, texture::moonNormal);
-	//mars
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY((time +6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f)), texture::mars, texture::marsNormal);
-	//aliens planet
-	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(time/3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f)), texture::aliensPlanet, texture::aliensPlanetNormal);
-	//venus
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f)), texture::venus, texture::venusNormal);
-	//haumea
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f)), texture::haumea, texture::haumeaNormal);
-	//mercury
-	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time/7) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f)), texture::mercury, texture::mercuryNormal);
 
 
 
+	/*glm::mat4 sunMatrix = glm::mat4();
+	glm::mat4 earthMatrix = glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0));
+	glm::mat4 moonMatrix = glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(3.f, 0, 0));
+	glm::mat4 marsMatrix = glm::eulerAngleY((time + 6) / 3) * glm::translate(glm::vec3(15.f, 0, 0));
+	glm::mat4 aliensPlanetMatrix = glm::eulerAngleY(time / 3.3f) * glm::translate(glm::vec3(20.f, 0, 0));
+	glm::mat4 venusMatrix = glm::eulerAngleY(time / 4) * glm::translate(glm::vec3(25.f, 0, 0));
+	glm::mat4 haumeaMatrix = glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(30.f, 0, 0));
+	glm::mat4 mercuryMatrix = glm::eulerAngleY(time / 7) * glm::translate(glm::vec3(35.f, 0, 0));
+	*/
+	 engineDetailMatrix = glm::eulerAngleX(time / 10) * glm::eulerAngleY(time / 10) * glm::translate(glm::vec3(17.5f, 0, 0));
+	 shipRepairMatrix = glm::translate(glm::vec3(27.5f, 0, 0));
 
-
+	//ship
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::normalize(glm::cross(spaceshipSide, spaceshipDir));
 	glm::mat4 specshipCameraRotrationMatrix = glm::mat4({
@@ -232,11 +301,130 @@ void renderScene(GLFWwindow* window)
 		-spaceshipDir.x,-spaceshipDir.y,-spaceshipDir.z,0,
 		0.,0.,0.,1.,
 		});
+	shipMatrix = glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>());
+	//end ship
 
+
+	
+	
+
+
+	drawObjectTexture(programSun, sphereContext, glm::mat4() * glm::scale(glm::vec3(4.f)), texture::sun, texture::sun);
+	//earth
+	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)), texture::earth, texture::earthNormal);
+	//moon
+	drawObjectTexture(programTex, sphereContext,
+		glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)), texture::moon, texture::moonNormal);
+	//mars
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY((time + 6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f)), texture::mars, texture::marsNormal);
+	//aliens planet
+	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(time / 3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f)), texture::aliensPlanet, texture::aliensPlanetNormal);
+	//venus
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f)), texture::venus, texture::venusNormal);
+	//haumea
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f)), texture::haumea, texture::haumeaNormal);
+	//mercury
+	drawObjectTexture(programTex, sphereContext, glm::eulerAngleY(time / 7) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f)), texture::mercury, texture::mercuryNormal);
+
+
+	//ship to repair
+	drawObjectTexture(programTex, shipToRepairContext, /*glm::eulerAngleY(time / 7) **/ shipRepairMatrix * glm::scale(glm::vec3(0.1f)), texture::shipRepair, texture::shipRepairNormal);
+
+	
+	//ship
 	drawObjectTexture(programShip, shipContext,
-		glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f)),
+		shipMatrix/*glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) */* glm::scale(glm::vec3(0.04f)),
 		texture::ship, texture::shipNormal
 	);
+
+
+	//drawDetails(spaceshipEngineDetailContext, engineDetailMatrix* glm::scale(glm::vec3(0.2f)), texture::engineDetail, texture::engineDetailNormal);
+	//drawDetails(firstAidBoxContext, glm::translate(glm::vec3(12.5f, 3, 0)) * glm::scale(glm::vec3(0.1f)), texture::firstAidKit, texture::firstAidKitNormal);
+
+
+	//together for every detail
+
+	glm::vec3 shipRepairTranslationVec = glm::vec3(shipRepairMatrix[3]);
+	glm::vec3 shipTranslationVec = glm::vec3(shipMatrix[3]);
+	glm::vec3 spaceshipPosCOPY = spaceshipPos;
+	spaceshipPosCOPY.y -= 0.5;
+
+
+	//engine detail drag
+	glm::vec3 engineDetailTranslationVec = glm::vec3(engineDetailMatrix[3]);
+	
+		if (glm::distance(shipTranslationVec, engineDetailTranslationVec) < 1.0f)
+		canPickUpEngine = true;
+	if (isPKeyPressed && canPickUpEngine) {
+		isObjectPickedUp = true;
+		//std::cout << "HIIIGH!!!   " << "R pressed" << isRKeyPressed << ' ' << "P pressed" << isPKeyPressed << std::endl;
+		engineDetailMatrix = glm::translate(spaceshipPosCOPY);
+		float dist = glm::distance(shipTranslationVec, shipRepairTranslationVec);
+		//std::cout << "x:"<< shipTranslationVec.x << "y:" << shipTranslationVec.y << "z:" << shipTranslationVec.z<< std::endl;
+
+		if (glm::distance(shipTranslationVec, shipRepairTranslationVec) < 3.f) {
+			isEngineCloseToShipRepair = true;
+			//std::cout << "near repair!!" << std::endl;
+		}
+		else {
+			isEngineCloseToShipRepair = false;
+		}
+		//isObjectPickedUp = engine
+		if (isRKeyPressed && isObjectPickedUp && isEngineCloseToShipRepair) {
+			drawSpaceshipEngine = false;
+			std::cout << "Inside isRKeyPressed condition" << std::endl;
+			isPKeyPressed = false;
+			isRKeyPressed = false;
+		}
+	}
+	
+	if (drawSpaceshipEngine/*!isRKeyPressed&&!isEngineCloseToShipRepair*/) {
+		//drawObjectColor(sphereContext, shipRepairMatrix * glm::scale(glm::vec3(0.2f)), glm::vec3(1.0f, 0.f, 0.f));
+		drawObjectTexture(programTex, spaceshipEngineDetailContext, engineDetailMatrix * glm::scale(glm::vec3(0.2f)), texture::engineDetail, texture::engineDetailNormal);
+	}
+	////end engine
+
+
+	//start kit
+	kitMatrix = glm::translate(glm::vec3(12.5f, 6.f, 0));
+	glm::vec3 kitDetailTranslationVec = glm::vec3(kitMatrix[3]);
+	//spaceshipPosCOPY.y -= 0.5;
+	if (glm::distance(shipTranslationVec, kitDetailTranslationVec) < 1.0f)
+		canPickUpKit = true;
+	if (isPKeyPressed && canPickUpKit) {
+		isKitPickedUp = true;
+
+		kitMatrix = glm::translate(spaceshipPosCOPY);
+		float dist = glm::distance(shipTranslationVec, shipRepairTranslationVec);
+		std::cout << "x:" << shipTranslationVec.x << "y:" << shipTranslationVec.y << "z:" << shipTranslationVec.z << std::endl;
+
+		if (glm::distance(shipTranslationVec, shipRepairTranslationVec) < 3.f) {
+			isKitCloseToShipRepair = true;
+			std::cout << "near repair!!" << std::endl;
+		}
+		else {
+			isKitCloseToShipRepair = false;
+		}
+
+		if (isRKeyPressed && isKitPickedUp && isKitCloseToShipRepair) {
+			drawSpaceshipKit = false;
+			std::cout << "Inside isRKeyPressed condition KIT" << std::endl;
+			//std::cout << "Before reset - R: " << isRKeyPressed << ", P: " << isPKeyPressed << std::endl;
+
+			isPKeyPressed = false;
+			isRKeyPressed = false;
+
+			//std::cout << "After reset - R: " << isRKeyPressed << ", P: " << isPKeyPressed << std::endl;
+
+		}
+	}
+
+	if (drawSpaceshipKit) {
+		drawObjectTexture(programTex, firstAidBoxContext, kitMatrix * glm::scale(glm::vec3(0.06f)), texture::firstAidKit, texture::firstAidKitNormal);
+	}
+
+	
+
 
 	glfwSwapBuffers(window);
 }
@@ -248,7 +436,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 void loadModelToContext(std::string path, Core::RenderContext& context)
 {
 	Assimp::Importer import;
-	const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
+	const aiScene * scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -266,12 +454,19 @@ void init(GLFWwindow* window)
 	int w, h;
 	unsigned char* data;
 	std::vector<std::string> filepaths = {
-	 "./textures/skybox/lightblue/right.png",
+	 /*"./textures/skybox/lightblue/right.png",
 	  "./textures/skybox/lightblue/left.png",
 	  "./textures/skybox/lightblue/top.png",
 	  "./textures/skybox/lightblue/bot.png",
 	  "./textures/skybox/lightblue/front.png",
-	  "./textures/skybox/lightblue/back.png",
+	  "./textures/skybox/lightblue/back.png",*/
+
+		"./textures/skybox/red/bkg1_right1.png",
+    "./textures/skybox/red/bkg1_left2.png",
+    "./textures/skybox/red/bkg1_top3.png",
+    "./textures/skybox/red/bkg1_bottom4.png",
+    "./textures/skybox/red/bkg1_front5.png",
+    "./textures/skybox/red/bkg1_back6.png",
 	};
 	for (unsigned int i = 0; i < 6; i++)
 	{
@@ -298,13 +493,17 @@ void init(GLFWwindow* window)
 	programSun = shaderLoader.CreateProgram("shaders/shader_5_sun.vert", "shaders/shader_5_sun.frag");
 	programShip = shaderLoader.CreateProgram("shaders/shader_ship.vert", "shaders/shader_ship.frag");
 	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
-	
+
 	loadModelToContext("./models/sphere.obj", sphereContext);
 	loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 	//loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 	loadModelToContext("./models/cube.obj", cubeMapContex);
 
-	
+	loadModelToContext("./models/airplane-engine-detail.obj", spaceshipEngineDetailContext);
+	loadModelToContext("./models/UFO.obj", shipToRepairContext);
+	loadModelToContext("./models/Firstaidbox.obj", firstAidBoxContext);
+
+
 
 
 	//new objects
@@ -324,7 +523,20 @@ void init(GLFWwindow* window)
 	texture::rust = Core::LoadTexture("textures/spaceship/rust.png");
 	texture::rustNormal = Core::LoadTexture("textures/spaceship/rust_normal.jpg");
 	texture::shipScratches = Core::LoadTexture("textures/spaceship/scratches.png");
-	
+
+
+	texture::shipRepair = Core::LoadTexture("textures/spaceship/ufo_main_ship_to_repair.png");
+	texture::shipRepairNormal = Core::LoadTexture("textures/spaceship/ufo_normal.png");
+
+	texture::engineDetail = Core::LoadTexture("textures/details/airplane_engine_BaseColor.png");
+	texture::engineDetailNormal = Core::LoadTexture("textures/details/airplane_engine_Normal.png");
+
+	texture::firstAidKit = Core::LoadTexture("textures/details/first_aid_box_base.png");
+	texture::firstAidKitNormal = Core::LoadTexture("textures/details/first_aid_box_base_normal.png");
+
+
+
+
 	texture::moon = Core::LoadTexture("textures/planets/8k_moon.jpg");
 	texture::moonNormal = Core::LoadTexture("textures/planets/moon_normal.jpg");
 
@@ -343,7 +555,7 @@ void init(GLFWwindow* window)
 
 	texture::jupiter = Core::LoadTexture("textures/planets/jupiter.jpg");
 	texture::jupiterNormal = Core::LoadTexture("textures/planets/jupiter_normal.jpg");
-	
+
 	texture::haumea = Core::LoadTexture("textures/planets/haumea.jpg");
 	texture::haumeaNormal = Core::LoadTexture("textures/planets/haumea_normal.jpg");
 
@@ -385,6 +597,26 @@ void processInput(GLFWwindow* window)
 		spaceshipDir = glm::vec3(glm::eulerAngleY(angleSpeed) * glm::vec4(spaceshipDir, 0));
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		spaceshipDir = glm::vec3(glm::eulerAngleY(-angleSpeed) * glm::vec4(spaceshipDir, 0));
+
+
+	if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS))
+	{
+		spaceshipPos += spaceshipDir * moveSpeed * 5;
+		isShifWtPressed = true;
+	}
+	
+
+
+	if ((glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS))
+	{
+		isPKeyPressed = true;
+	}
+	
+	if ((glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS))
+	{
+		isRKeyPressed = true;
+	}
+	
 
 	cameraPos = spaceshipPos - 1.5 * spaceshipDir + glm::vec3(0, 1, 0) * 0.5f;
 	cameraDir = spaceshipDir;
