@@ -54,10 +54,10 @@
     <ClCompile Include="src\SOIL\image_helper.c">
       <Filter>Source Files\SOIL</Filter>
     </ClCompile>
-    <ClCompile Include="src\space_objects.cpp">
+    <ClCompile Include="src\objects\planets_list.cpp">
       <Filter>Header Files\objects</Filter>
     </ClCompile>
-    <ClCompile Include="src\planets_list.cpp">
+    <ClCompile Include="src\objects\space_objects.cpp">
       <Filter>Header Files\objects</Filter>
     </ClCompile>
   </ItemGroup>

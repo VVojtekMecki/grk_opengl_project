@@ -16,7 +16,7 @@
 #include <string>
 #include <..\..\cw 7\src\SOIL\SOIL.h>
 #include <vector>
-#include "planets_list.cpp"
+#include "objects/planets_list.cpp"
 
 
 namespace texture {
