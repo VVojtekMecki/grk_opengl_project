@@ -1,4 +1,4 @@
-#include "space_objects.cpp"
+#include "space_objects.h"
 #include <map>
 
 class SpaceObjectProperties {

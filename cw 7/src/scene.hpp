@@ -17,38 +17,19 @@
 #include <..\..\cw 7\src\SOIL\SOIL.h>
 #include <vector>
 #include "objects/planets_list.cpp"
+#include "objects/player_ship.cpp"
 
 
 namespace texture {
-
-	GLuint ship;
-	GLuint rust;
-
-	GLuint moon;
-	GLuint sun;
 	GLuint cubemap;
-
-	GLuint shipScratches;
-	GLuint shipNormal;
-	GLuint moonNormal;
-	GLuint rustNormal;
-
 	GLuint skybox;
 }
 
-
 GLuint program;
-//GLuint programSun;
-//GLuint programTex;
-//GLuint programEarth;
-//GLuint programProcTex;
-GLuint programShip;
 GLuint programSkybox;
 
 Core::Shader_Loader shaderLoader;
 
-Core::RenderContext shipContext;
-//Core::RenderContext sphereContext;
 Core::RenderContext cubeMapContex;
 
 glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
@@ -104,23 +85,7 @@ glm::mat4 createPerspectiveMatrix()
 
 SpaceObjectsList spaceObjectsList(glfwGetTime(), createPerspectiveMatrix()* createCameraMatrix());
 
-void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
-	glUseProgram(program);
-	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
-	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
-	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
-	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
-
-	if (textureID == texture::ship) {
-		Core::SetActiveTexture(texture::ship, "ship", program, 0);
-		Core::SetActiveTexture(texture::rust, "rust", program, 1);
-		Core::SetActiveTexture(texture::shipScratches, "asteroid", program, 2);
-		Core::SetActiveTexture(normalmapId, "normalSampler", program, 3);
-	}
-
-	Core::DrawContext(context);
-	glUseProgram(0);
-}
+PlayerShip player;
 
 void renderScene(GLFWwindow* window)
 {
@@ -173,10 +138,9 @@ void renderScene(GLFWwindow* window)
 		0.,0.,0.,1.,
 		});
 
-	drawObjectTexture(programShip, shipContext,
-		glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f)),
-		texture::ship, texture::shipNormal
-	);
+	glm::mat4 shipModelMatrix = glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f));
+
+	player.ship->drawObjectTexture(projectionMatrix, shipModelMatrix);
 
 	glfwSwapBuffers(window);
 }
@@ -234,20 +198,12 @@ void init(GLFWwindow* window)
 
 	glEnable(GL_DEPTH_TEST);
 	program = shaderLoader.CreateProgram("shaders/shader_5_1.vert", "shaders/shader_5_1.frag");
-	programShip = shaderLoader.CreateProgram("shaders/shader_ship.vert", "shaders/shader_ship.frag");
 	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
 	
-	loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 	loadModelToContext("./models/cube.obj", cubeMapContex);
 
-	texture::ship = Core::LoadTexture("textures/spaceship/spaceship.jpg");
-	texture::shipNormal = Core::LoadTexture("textures/spaceship/SF_Fighter_Normal.jpg");
-	texture::rust = Core::LoadTexture("textures/spaceship/rust.png");
-	texture::rustNormal = Core::LoadTexture("textures/spaceship/rust_normal.jpg");
-	texture::shipScratches = Core::LoadTexture("textures/spaceship/scratches.png");
-
-	texture::moonNormal = Core::LoadTexture("textures/planets/moon_normal.jpg");
 	spaceObjectsList.init();
+	player.init();
 }
 
 void shutdown(GLFWwindow* window)

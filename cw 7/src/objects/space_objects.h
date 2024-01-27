@@ -14,6 +14,9 @@
 #include "../Render_Utils.h"
 #include "../Texture.h"
 
+#ifndef SPACE_OBJECT_H
+#define SPACE_OBJECT_H
+
 class SpaceObject {
 	public:
 		virtual ~SpaceObject() = default;
@@ -27,6 +30,10 @@ class SpaceObject {
 		virtual float getTime(float time) { return time; };
 };
 
+#endif
+
+#ifndef PLANET_H
+#define PLANET_H
 
 class Planet : public SpaceObject {
 	public:
@@ -60,6 +67,11 @@ class Planet : public SpaceObject {
 		std::string getName() const override { return this->name; };
 };
 
+#endif
+
+#ifndef CLOUDED_PLANET_H
+#define CLOUDED_PLANET_H
+
 class CloudedPlanet : public Planet {
 private:
 	GLuint clouds;
@@ -87,6 +99,11 @@ public:
 	Core::RenderContext& getContext() const override { return this->context; };
 	glm::mat4 getModelMatrix() const override { return this->modelMatrix; };
 };
+
+#endif
+
+#ifndef SUN_H
+#define SUN_H
 
 class Sun : public SpaceObject {
 	public:
@@ -119,42 +136,4 @@ class Sun : public SpaceObject {
 		std::string getName() const override { return this->name; };
 };
 
-class Ship : public SpaceObject {
-
-	GLuint rust = Core::LoadTexture("textures/spaceship/rust.png");
-	GLuint shipScratches = Core::LoadTexture("textures/spaceship/scratches.png");
-
-	public:
-		std::string name;
-		GLuint texture;
-		GLuint normals;
-		GLuint program;
-		Core::RenderContext& context;
-		glm::mat4 modelMatrix;
-
-	public:
-		Ship(std::string name, GLuint program, Core::RenderContext& context, GLuint texture, GLuint normals)
-			: program(program), context(context), texture(texture), normals(normals), name(name) {}
-
-		void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const override {
-			glUseProgram(program);
-			glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
-			glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
-			glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
-
-			Core::SetActiveTexture(texture, "ship", program, 0);
-			Core::SetActiveTexture(rust, "rust", program, 1);
-			Core::SetActiveTexture(shipScratches, "scratches", program, 2);
-			Core::SetActiveTexture(normals, "normalSampler", program, 3);
-
-			Core::DrawContext(context);
-			glUseProgram(0);
-		}
-		GLuint getTexture() const override { return this->texture; };
-		GLuint getNormals() const override { return this->normals; };
-		GLuint getProgram() const override { return this->program; };
-		Core::RenderContext& getContext() const override { return this->context; };
-		glm::mat4 getModelMatrix() const override { return this->modelMatrix; };
-		std::string getName() const override { return this->name; };
-};
-
+#endif
