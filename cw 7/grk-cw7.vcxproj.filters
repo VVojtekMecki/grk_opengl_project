@@ -54,10 +54,13 @@
     <ClCompile Include="src\SOIL\image_helper.c">
       <Filter>Source Files\SOIL</Filter>
     </ClCompile>
-    <ClCompile Include="src\space_objects.cpp">
+    <ClCompile Include="src\objects\planets_list.cpp">
       <Filter>Header Files\objects</Filter>
     </ClCompile>
-    <ClCompile Include="src\planets_list.cpp">
+    <ClCompile Include="src\objects\player_ship.cpp">
+      <Filter>Header Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\objects\space_objects.h">
       <Filter>Header Files\objects</Filter>
     </ClCompile>
   </ItemGroup>
@@ -97,6 +100,12 @@
     </ClInclude>
     <ClInclude Include="src\scene.hpp">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\ship.h">
+      <Filter>Header Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\skybox.h">
+      <Filter>Header Files\objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

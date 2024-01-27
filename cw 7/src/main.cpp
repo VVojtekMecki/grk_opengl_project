@@ -22,8 +22,10 @@ int main(int argc, char** argv)
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-	float width = 1280;
-	float height = 720;
+	/*float width = 1280;
+	float height = 720;*/
+	float width = 1920;
+	float height = 1080;
 
 	// tworzenie okna za pomoca glfw
 	GLFWwindow* window = glfwCreateWindow(width, height, "FirstWindow", NULL, NULL);
