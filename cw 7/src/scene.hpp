@@ -182,45 +182,6 @@ void drawObjectColor(Core::RenderContext& context, glm::mat4 modelMatrix, glm::v
 	Core::DrawContext(context);
 
 }
-//struct BlueSphere {
-//	glm::vec3 position;
-//	glm::vec3 velocity;
-//	glm::vec3 color;
-//};
-//
-//// Vector to store all the blue spheres
-//std::vector<BlueSphere> blueSpheres;
-//
-//// Function to add a new blue sphere
-//void createBlueSphere() {
-//	BlueSphere blueSphere;
-//	blueSphere.position = spaceshipPos + spaceshipDir * 2.0f; // Initial position near the spaceship
-//	blueSphere.velocity = glm::normalize(glm::vec3(rand() % 100 - 50, rand() % 100 - 50, rand() % 100 - 50)); // Random velocity
-//	blueSphere.color = glm::vec3(0.0f, 0.0f, 1.0f); // Blue color
-//	blueSpheres.push_back(blueSphere);
-//}
-//
-//// Function to update and render blue spheres
-//void updateAndRenderBlueSpheres() {
-//	for (auto& blueSphere : blueSpheres) {
-//		// Update position based on velocity
-//		blueSphere.position += blueSphere.velocity * deltaTime;
-//
-//		// Render the blue sphere
-//		drawObjectColor(sphereContext, glm::translate(blueSphere.position) * glm::scale(glm::vec3(0.8f)), blueSphere.color);
-//	}
-//
-//	// Remove blue spheres that are too far away to improve performance
-//	blueSpheres.erase(
-//		std::remove_if(
-//			blueSpheres.begin(),
-//			blueSpheres.end(),
-//			[](const BlueSphere& sphere) {
-//				return glm::length(sphere.position - spaceshipPos) > 50.0f;
-//			}),
-//		blueSpheres.end());
-//}
-
 void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
 	glUseProgram(program);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
