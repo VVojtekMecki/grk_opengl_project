@@ -25,8 +25,8 @@ void main()
 {
     worldPos = (modelMatrix * vec4(vertexPosition, 1)).xyz;
     normal = (modelMatrix * vec4(vertexNormal, 0)).xyz;
-    tangent = (modelMatrix * vec4(vertexTangent, 0)).xyz;
-    bitangent = (modelMatrix * vec4(vertexBitangent, 0)).xyz;
+    tangent = normalize(mat3(modelMatrix)*vertexTangent);
+	bitangent = normalize(mat3(modelMatrix)*vertexBitangent);
     mat3 TBN = transpose(mat3(tangent, bitangent, normal));
     fragTexCoord = vec2(vertexTexCoord.x, vertexTexCoord.y);
 

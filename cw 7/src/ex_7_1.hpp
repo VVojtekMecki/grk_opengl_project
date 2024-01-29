@@ -165,8 +165,11 @@ void drawObjectPBR(GLuint program, Core::RenderContext& context, glm::mat4 model
 
 	glUniform1f(glGetUniformLocation(program, "roughness"), roughness);
 	glUniform1f(glGetUniformLocation(program, "metallic"), metallic);
-	Core::SetActiveTexture(texture::earth, "texture1", program, 0);
-	Core::SetActiveTexture(texture::sun, "texture2", program, 1);
+
+	Core::SetActiveTexture(texture::asteroid_grey, "texture1", program, 0);
+	Core::SetActiveTexture(texture::asteroid_red, "texture2", program, 1);
+	Core::SetActiveTexture(texture::asteroidNormal, "textureNormal", program, 2);
+
 
 	//glUniform3f(glGetUniformLocation(programPBR, "color"), color.x, color.y, color.z);
 
@@ -212,7 +215,7 @@ void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 m
 	}
 	else if (textureID == texture::ship) {
 		Core::SetActiveTexture(texture::ship, "ship", program, 0);
-		Core::SetActiveTexture(texture::rust, "rust", program, 1);
+		Core::SetActiveTexture(texture::earth, "rust", program, 1);
 		Core::SetActiveTexture(texture::shipScratches, "asteroid", program, 2);
 		Core::SetActiveTexture(normalmapId, "normalSampler", program, 3);
 
@@ -274,7 +277,8 @@ void renderScene(GLFWwindow* window)
 	//sun
 	drawObjectTexture(programSun, sphereContext, glm::mat4() * glm::scale(glm::vec3(4.f)), texture::sun, texture::sun);
 	//earth
-	drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(timeGL / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)), texture::earth, texture::earthNormal);
+	//drawObjectTexture(programEarth, sphereContext, glm::eulerAngleY(timeGL / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)), texture::earth, texture::earthNormal);
+	drawObjectPBR(programPBR, sphereContext, glm::eulerAngleY(timeGL / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)), glm::vec3(0.3, 0.3, 0.5), 0, 0);
 	//moon
 	drawObjectTexture(programTex, sphereContext,
 		glm::eulerAngleY(timeGL / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(timeGL) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)), texture::moon, texture::moonNormal);
@@ -298,7 +302,7 @@ void renderScene(GLFWwindow* window)
 		positionZ = asteroidPositions[asteroid][2];
 
 		glm::mat4 asteroid1Scale = glm::scale(glm::vec3(0.5f));
-		glm::mat4 asteroid1Rotate = glm::rotate(timeGL * 0.05f, glm::vec3(0, 1, 0));
+		glm::mat4 asteroid1Rotate = glm::rotate(timeGL * 0.02f, glm::vec3(0, 1, 0));
 		glm::mat4 asteroid1Translate = glm::translate(glm::vec3(positionX, positionY, positionZ));
 		//drawObjectTexture(programTex, asteroidContext, asteroid1Scale * asteroid1Rotate * asteroid1Translate, asteroidTextures[asteroid], texture::asteroidNormal);
 		drawObjectPBR(programPBR, asteroidContext, asteroid1Scale * asteroid1Rotate * asteroid1Translate, glm::vec3(0.3, 0.3, 0.5), 0.2, 0.8);
@@ -318,7 +322,7 @@ void renderScene(GLFWwindow* window)
 	//	glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f)),
 	//	texture::ship, texture::shipNormal
 	//);
-	drawObjectPBR(program, shipContext,
+	drawObjectPBR(programPBR, shipContext,
 		glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.03f)),
 		glm::vec3(0.3, 0.3, 0.5),
 		0.2, 1.0

@@ -21,8 +21,6 @@ void main()
 {
     //vec3 lightDir = normalize(lightPos - worldPos);
     vec3 normal = normalize(normal);
-    vec3 tangent = normalize(tangent);
-    vec3 bitangent = normalize(bitangent);
     vec4 N = texture(normalSampler, fragTexCoord);
     vec3 normalN = normalize((N*2.0-1.0).xyz);
     float diffuse = max(0, dot(normalN, viewDirTs));
