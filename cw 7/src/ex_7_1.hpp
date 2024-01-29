@@ -19,9 +19,6 @@
 #include <vector>
 using namespace std;
 
-const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-
-int WIDTH = 500, HEIGHT = 500;
 
 namespace texture {
 	GLuint earth;
@@ -75,8 +72,6 @@ GLuint programProcTex;
 GLuint programShip;
 GLuint programSkybox;
 GLuint programAsteroid;
-GLuint programPBR;
-
 
 Core::Shader_Loader shaderLoader;
 
@@ -85,8 +80,6 @@ Core::RenderContext sphereContext;
 Core::RenderContext cubeMapContex;
 Core::RenderContext mercuryPlanetContex;
 Core::RenderContext asteroidContext;
-Core::RenderContext barrelContext;
-
 
 glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
@@ -94,25 +87,16 @@ glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
 glm::vec3 spaceshipPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 spaceshipDir = glm::vec3(1.f, 0.f, 0.f);
 GLuint VAO, VBO;
+GLuint asteroidVAO;
+GLuint asteroidVBO; // Буфер вершин
+GLuint asteroidEBO; // Буфер индексов
+GLsizei asteroidIndicesCount;
 float aspectRatio = 1.f;
 float timeGL = 0;
 float lastFrameTime = 0.0f;
 float deltaTime = 0.0f;
 int positionX, positionY, positionZ = 0;
 const int amountAsteroids = 100;
-float exposition = 1.f;
-
-glm::vec3 sunPos = glm::vec3(-4.740971f, 2.149999f, 0.369280f);
-glm::vec3 sunDir = glm::vec3(-0.93633f, 0.351106, 0.003226f);
-glm::vec3 sunColor = glm::vec3(0.9f, 0.9f, 0.7f) * 5;
-
-glm::vec3 pointlightPos = glm::vec3(0, 2, 0);
-glm::vec3 pointlightColor = glm::vec3(0.9, 0.6, 0.6);
-
-glm::vec3 spotlightPos = glm::vec3(0, 0, 0);
-glm::vec3 spotlightConeDir = glm::vec3(0, 0, 0);
-glm::vec3 spotlightColor = glm::vec3(0.4, 0.4, 0.9) * 3;
-float spotlightPhi = 3.14 / 4;
 
 int asteroidPositions[amountAsteroids][3];
 GLuint asteroidTextures[amountAsteroids];
@@ -153,43 +137,24 @@ glm::mat4 createPerspectiveMatrix()
 	return perspectiveMatrix;
 }
 
-void drawObjectPBR(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color, float roughness, float metallic) {
+void drawObjectColor(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color, int instanceCount) {
+
 	glUseProgram(program);
+	glBindVertexArray(asteroidVAO);
 
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+	glUniform3f(glGetUniformLocation(program, "color"), color.x, color.y, color.z);
+	glUniform3f(glGetUniformLocation(program, "lightPos"), 0, 0, 0);
 
-	glUniform1f(glGetUniformLocation(program, "exposition"), exposition);
-
-	glUniform1f(glGetUniformLocation(program, "roughness"), roughness);
-	glUniform1f(glGetUniformLocation(program, "metallic"), metallic);
-	Core::SetActiveTexture(texture::earth, "texture1", program, 0);
-	Core::SetActiveTexture(texture::sun, "texture2", program, 1);
-
-	//glUniform3f(glGetUniformLocation(programPBR, "color"), color.x, color.y, color.z);
-
-	glUniform3f(glGetUniformLocation(program, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
-
-	glUniform3f(glGetUniformLocation(program, "sunDir"), sunDir.x, sunDir.y, sunDir.z);
-	glUniform3f(glGetUniformLocation(program, "sunColor"), sunColor.x, sunColor.y, sunColor.z);
-
-	glUniform3f(glGetUniformLocation(program, "lightPos"), pointlightPos.x, pointlightPos.y, pointlightPos.z);
-	glUniform3f(glGetUniformLocation(program, "lightColor"), pointlightColor.x, pointlightColor.y, pointlightColor.z);
-
-	glUniform3f(glGetUniformLocation(program, "spotlightConeDir"), spotlightConeDir.x, spotlightConeDir.y, spotlightConeDir.z);
-	glUniform3f(glGetUniformLocation(program, "spotlightPos"), spotlightPos.x, spotlightPos.y, spotlightPos.z);
-	glUniform3f(glGetUniformLocation(program, "spotlightColor"), spotlightColor.x, spotlightColor.y, spotlightColor.z);
-	glUniform1f(glGetUniformLocation(program, "spotlightPhi"), spotlightPhi);
-	
+	glDrawElementsInstanced(GL_TRIANGLES, asteroidIndicesCount, GL_UNSIGNED_INT, 0, instanceCount);
 	Core::DrawContext(context);
 	glUseProgram(0);
 
 }
-
-void drawObjectTexture(GLuint program,  Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
-
+void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
 	glUseProgram(program);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
@@ -217,7 +182,6 @@ void drawObjectTexture(GLuint program,  Core::RenderContext& context, glm::mat4 
 		Core::SetActiveTexture(normalmapId, "normalSampler", program, 3);
 
 
-
 	}
 	else if (textureID == texture::aliensPlanet) {
 		Core::SetActiveTexture(textureID, "earth", program, 0);
@@ -233,6 +197,14 @@ void drawObjectTexture(GLuint program,  Core::RenderContext& context, glm::mat4 
 	glUseProgram(0);
 }
 
+void drawAsteroid(Core::RenderContext& asteroidContext, float scale, float rotationSpeed, const glm::vec3& translate, float time, int instanceCount) {
+	glm::mat4 asteroidScale = glm::scale(glm::vec3(scale));
+	glm::mat4 asteroidRotate = glm::rotate(time * rotationSpeed, glm::vec3(0, 1, 0));
+	glm::mat4 asteroidTranslate = glm::translate(translate);
+
+	drawObjectColor(asteroidContext, asteroidScale * asteroidRotate * asteroidTranslate, glm::vec3(0.50, 0.5, 0.5), instanceCount);
+}
+
 
 
 GLuint getRandomAsteroidTexture() {
@@ -246,7 +218,6 @@ int getRandomNumber(int min, int max) {
 	int randomNumber = rand() % (max - min + 1) + min;
 	return randomNumber;
 }
-
 
 
 void renderScene(GLFWwindow* window)
@@ -269,7 +240,6 @@ void renderScene(GLFWwindow* window)
 	Core::DrawContext(cubeMapContex);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//glUniform1i(glGetUniformLocation(skyboxProgram, "skybox"), 0);
-
 
 	//sun
 	drawObjectTexture(programSun, sphereContext, glm::mat4() * glm::scale(glm::vec3(4.f)), texture::sun, texture::sun);
@@ -300,9 +270,8 @@ void renderScene(GLFWwindow* window)
 		glm::mat4 asteroid1Scale = glm::scale(glm::vec3(0.5f));
 		glm::mat4 asteroid1Rotate = glm::rotate(timeGL * 0.05f, glm::vec3(0, 1, 0));
 		glm::mat4 asteroid1Translate = glm::translate(glm::vec3(positionX, positionY, positionZ));
-		//drawObjectTexture(programTex, asteroidContext, asteroid1Scale * asteroid1Rotate * asteroid1Translate, asteroidTextures[asteroid], texture::asteroidNormal);
-		drawObjectPBR(programPBR, asteroidContext, asteroid1Scale * asteroid1Rotate * asteroid1Translate, glm::vec3(0.3, 0.3, 0.5), 0.2, 0.8);
-	}	
+		drawObjectTexture(programTex, asteroidContext, asteroid1Scale * asteroid1Rotate * asteroid1Translate, asteroidTextures[asteroid], texture::asteroidNormal);
+	}
 
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::normalize(glm::cross(spaceshipSide, spaceshipDir));
@@ -314,18 +283,12 @@ void renderScene(GLFWwindow* window)
 		});
 
 
-	//drawObjectTexture(programShip, shipContext,
-	//	glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f)),
-	//	texture::ship, texture::shipNormal
-	//);
-	drawObjectPBR(program, shipContext,
-		glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.03f)),
-		glm::vec3(0.3, 0.3, 0.5),
-		0.2, 1.0
+	drawObjectTexture(programShip, shipContext,
+		glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f)),
+		texture::ship, texture::shipNormal
 	);
+
 	//glUseProgram(0);
-	spotlightPos = spaceshipPos + 0.2 * spaceshipDir;
-	spotlightConeDir = spaceshipDir;
 	glfwSwapBuffers(window);
 }
 
@@ -393,11 +356,8 @@ void init(GLFWwindow* window)
 	programEarth = shaderLoader.CreateProgram("shaders/shader_earth.vert", "shaders/shader_earth.frag");
 	programProcTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex.vert", "shaders/shader_5_1_tex.frag");
 	programSun = shaderLoader.CreateProgram("shaders/shader_5_sun.vert", "shaders/shader_5_sun.frag");
-
 	programShip = shaderLoader.CreateProgram("shaders/shader_ship.vert", "shaders/shader_ship.frag");
 	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
-	programPBR = shaderLoader.CreateProgram("shaders/PBR.vert", "shaders/PBR.frag");
-
 	//programAsteroid = shaderLoader.CreateProgram("shaders/shader_asteroid.vert", "shaders/shader_asteroid.frag");
 
 
@@ -406,7 +366,6 @@ void init(GLFWwindow* window)
 	//loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 	loadModelToContext("./models/cube.obj", cubeMapContex);
 	loadModelToContext("./models/asteroid.obj", asteroidContext);
-
 
 
 
@@ -520,10 +479,7 @@ void processInput(GLFWwindow* window)
 	cameraDir = spaceshipDir;
 
 	//cameraDir = glm::normalize(-cameraPos);
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		exposition -= 0.05;
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-		exposition += 0.05;
+
 }
 
 // funkcja jest glowna petla
