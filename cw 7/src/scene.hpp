@@ -97,7 +97,7 @@ glm::vec3 spaceshipPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 spaceshipDir = glm::vec3(1.f, 0.f, 0.f);
 GLuint VAO, VBO;
 
-bool isShifWtPressed=false;
+bool isShifWtPressed = false;
 bool isPKeyPressed = false;
 bool canPickUpEngine = false;
 bool canPickUpKit = false;
@@ -110,9 +110,9 @@ bool drawSpaceshipCrew = true;
 
 bool isDragging = false;
 
-bool isObjectPickedUp=false;
-bool isKitPickedUp =false;
-bool isCrewPickedUp =false;
+bool isObjectPickedUp = false;
+bool isKitPickedUp = false;
+bool isCrewPickedUp = false;
 
 bool isEngineCloseToShipRepair = false;
 bool isKitCloseToShipRepair = false;
@@ -226,6 +226,7 @@ void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 m
 }
 
 
+
 void renderScene(GLFWwindow* window)
 {
 
@@ -261,8 +262,8 @@ void renderScene(GLFWwindow* window)
 	glm::mat4 haumeaMatrix = glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(30.f, 0, 0));
 	glm::mat4 mercuryMatrix = glm::eulerAngleY(time / 7) * glm::translate(glm::vec3(35.f, 0, 0));
 	*/
-	 engineDetailMatrix = glm::eulerAngleX(time / 10) * glm::eulerAngleY(time / 10) * glm::translate(glm::vec3(17.5f, 0, 0));
-	 shipRepairMatrix = glm::translate(glm::vec3(27.5f, 4, 0));
+	engineDetailMatrix = glm::eulerAngleX(time / 10) * glm::eulerAngleY(time / 10) * glm::translate(glm::vec3(17.5f, 0, 0));
+	shipRepairMatrix = glm::translate(glm::vec3(27.5f, 4, 0));
 
 	//ship
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
@@ -277,8 +278,8 @@ void renderScene(GLFWwindow* window)
 	//end ship
 
 
-	
-	
+
+
 
 
 	drawObjectTexture(programSun, sphereContext, glm::mat4() * glm::scale(glm::vec3(4.f)), texture::sun, texture::sun);
@@ -302,14 +303,12 @@ void renderScene(GLFWwindow* window)
 	//ship to repair
 	drawObjectTexture(programTex, shipToRepairContext, shipRepairMatrix * glm::scale(glm::vec3(0.1f)), texture::shipRepair, texture::shipRepairNormal);
 
-	
+
 	//ship
 	drawObjectTexture(programShip, shipContext,
-		shipMatrix* glm::scale(glm::vec3(0.04f)),
+		shipMatrix * glm::scale(glm::vec3(0.04f)),
 		texture::ship, texture::shipNormal
 	);
-
-
 
 
 	//together for every detail
@@ -318,36 +317,34 @@ void renderScene(GLFWwindow* window)
 	glm::vec3 shipTranslationVec = glm::vec3(shipMatrix[3]);
 	glm::vec3 spaceshipPosCOPY = spaceshipPos;
 	spaceshipPosCOPY.y -= 0.7;
-	
+
 
 	//engine detail drag
 	glm::vec3 engineDetailTranslationVec = glm::vec3(engineDetailMatrix[3]);
-		if (glm::distance(shipTranslationVec, engineDetailTranslationVec) < 1.0f && !isDragging)
-		{
-			canPickUpEngine = true;
-		}
+	if (glm::distance(shipTranslationVec, engineDetailTranslationVec) < 1.0f && !isDragging)
+	{
+		canPickUpEngine = true;
+	}
 	if (isPKeyPressed && canPickUpEngine) {
-		isObjectPickedUp = true;
 		isDragging = true;
 
 		engineDetailMatrix = glm::translate(spaceshipPosCOPY);
 		float dist = glm::distance(shipTranslationVec, shipRepairTranslationVec);
 
-		if (glm::distance(shipTranslationVec, shipRepairTranslationVec) < 3.f) {
+		if (glm::distance(shipTranslationVec, shipRepairTranslationVec) < 3.f ) {
 			isEngineCloseToShipRepair = true;
 		}
 		else {
 			isEngineCloseToShipRepair = false;
 		}
 		//isObjectPickedUp - about engine
-		if (isRKeyPressed && isObjectPickedUp && isEngineCloseToShipRepair) {
+		if (isRKeyPressed&& isEngineCloseToShipRepair) {
 			drawSpaceshipEngine = false;
 
 			isPKeyPressed = false;
 			isRKeyPressed = false;
 
 			canPickUpEngine = false;
-			isObjectPickedUp = false;
 
 			isDragging = false;
 
@@ -367,7 +364,6 @@ void renderScene(GLFWwindow* window)
 		canPickUpKit = true;
 	}
 	if (isPKeyPressed && canPickUpKit) {
-		isKitPickedUp = true;
 		isDragging = true;
 		kitMatrix = glm::translate(spaceshipPosCOPY);
 		if (glm::distance(shipTranslationVec, shipRepairTranslationVec) < 3.f) {
@@ -376,13 +372,12 @@ void renderScene(GLFWwindow* window)
 		else {
 			isKitCloseToShipRepair = false;
 		}
-		if (isRKeyPressed ) {
+		if (isRKeyPressed) {
 			drawSpaceshipKit = false;
 			isPKeyPressed = false;
 			isRKeyPressed = false;
 
 			canPickUpKit = false;
-			isKitPickedUp = false;
 			isDragging = false;
 
 
@@ -391,23 +386,22 @@ void renderScene(GLFWwindow* window)
 	if (drawSpaceshipKit) {
 		drawObjectTexture(programTex, firstAidBoxContext, kitMatrix * glm::scale(glm::vec3(0.06f)), texture::firstAidKit, texture::firstAidKitNormal);
 	}
-	
+
 
 
 
 	//crew member
 	crewMemberMatrix = glm::eulerAngleX(time / 15) * glm::translate(glm::vec3(3.5f, -7.f, 0)) * glm::eulerAngleY(time / 15);
 	glm::vec3 crewDetailTranslationVec = glm::vec3(crewMemberMatrix[3]);
-	if (glm::distance(shipTranslationVec, crewDetailTranslationVec) < 1.0f&& !isDragging)
+	if (glm::distance(shipTranslationVec, crewDetailTranslationVec) < 1.0f && !isDragging)
 	{
 		canPickUpCrew = true;
-		
+
 	}
 	if (isPKeyPressed && canPickUpCrew) {
-		isCrewPickedUp = true;
 		isDragging = true;
 		crewMemberMatrix = glm::translate(spaceshipPosCOPY);
-		if (glm::distance(shipTranslationVec, shipRepairTranslationVec) < 3.f && !isObjectPickedUp && !isKitPickedUp) {
+		if (glm::distance(shipTranslationVec, shipRepairTranslationVec) < 3.f) {
 			isCrewCloseToShipRepair = true;
 		}
 		else {
@@ -418,14 +412,12 @@ void renderScene(GLFWwindow* window)
 			isPKeyPressed = false;
 			isRKeyPressed = false;
 
-			canPickUpCrew = false;
-			isCrewPickedUp = false;
 			isDragging = false;
 
 		}
 	}
 	if (drawSpaceshipCrew) {
-		drawObjectTexture(programTex, crewMemberContext, crewMemberMatrix*glm::scale(glm::vec3(0.05f)), texture::crewMember, texture::crewMemberNormal);
+		drawObjectTexture(programTex, crewMemberContext, crewMemberMatrix * glm::scale(glm::vec3(0.05f)), texture::crewMember, texture::crewMemberNormal);
 	}
 
 
@@ -457,19 +449,19 @@ void init(GLFWwindow* window)
 	int w, h;
 	unsigned char* data;
 	std::vector<std::string> filepaths = {
-	 /*"./textures/skybox/lightblue/right.png",
-	  "./textures/skybox/lightblue/left.png",
-	  "./textures/skybox/lightblue/top.png",
-	  "./textures/skybox/lightblue/bot.png",
-	  "./textures/skybox/lightblue/front.png",
-	  "./textures/skybox/lightblue/back.png",*/
+		/*"./textures/skybox/lightblue/right.png",
+		 "./textures/skybox/lightblue/left.png",
+		 "./textures/skybox/lightblue/top.png",
+		 "./textures/skybox/lightblue/bot.png",
+		 "./textures/skybox/lightblue/front.png",
+		 "./textures/skybox/lightblue/back.png",*/
 
-		"./textures/skybox/red/bkg1_right1.png",
-    "./textures/skybox/red/bkg1_left2.png",
-    "./textures/skybox/red/bkg1_top3.png",
-    "./textures/skybox/red/bkg1_bottom4.png",
-    "./textures/skybox/red/bkg1_front5.png",
-    "./textures/skybox/red/bkg1_back6.png",
+		   "./textures/skybox/red/bkg1_right1.png",
+	   "./textures/skybox/red/bkg1_left2.png",
+	   "./textures/skybox/red/bkg1_top3.png",
+	   "./textures/skybox/red/bkg1_bottom4.png",
+	   "./textures/skybox/red/bkg1_front5.png",
+	   "./textures/skybox/red/bkg1_back6.png",
 	};
 	for (unsigned int i = 0; i < 6; i++)
 	{
@@ -537,7 +529,7 @@ void init(GLFWwindow* window)
 
 	texture::firstAidKit = Core::LoadTexture("textures/details/first_aid_box_base.png");
 	texture::firstAidKitNormal = Core::LoadTexture("textures/details/first_aid_box_base_normal.png");
-	
+
 	texture::crewMember = Core::LoadTexture("textures/details/Alien_BaseColor.png");
 	texture::crewMemberNormal = Core::LoadTexture("textures/details/Alien_Normal.png");
 
@@ -610,22 +602,22 @@ void processInput(GLFWwindow* window)
 		spaceshipPos += spaceshipDir * moveSpeed * 5;
 		isShifWtPressed = true;
 	}
-	
 
 
-	if ((glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)&&(canPickUpEngine||canPickUpKit||canPickUpCrew))
+
+	if ((glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) && (canPickUpEngine || canPickUpKit || canPickUpCrew))
 	{
 		isPKeyPressed = true;
 		//std::cout << "iside input: P    canPickUpEngine " << canPickUpEngine << "	canPickUpKit " << canPickUpKit<< "	canPickUpCrew " << canPickUpCrew << std::endl;
 	}
-	
-	if ((glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) && (isKitPickedUp||isObjectPickedUp||isCrewPickedUp) && (isKitCloseToShipRepair || isEngineCloseToShipRepair||isCrewCloseToShipRepair))
+
+	if ((glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) && (isKitPickedUp || isObjectPickedUp || isCrewPickedUp) && (isKitCloseToShipRepair || isEngineCloseToShipRepair || isCrewCloseToShipRepair))
 	{
 		isRKeyPressed = true;
 		//std::cout << "iside input: R   " << isRKeyPressed << std::endl;
 
 	}
-	
+
 
 	cameraPos = spaceshipPos - 1.5 * spaceshipDir + glm::vec3(0, 1, 0) * 0.5f;
 	cameraDir = spaceshipDir;
