@@ -63,6 +63,9 @@
     <ClCompile Include="src\objects\space_objects.h">
       <Filter>Header Files\objects</Filter>
     </ClCompile>
+    <ClCompile Include="src\objects\asteroids_list.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\objload.h">

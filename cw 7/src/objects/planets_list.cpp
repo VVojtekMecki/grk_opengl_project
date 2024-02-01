@@ -50,7 +50,6 @@ private:
 	GLuint programEarth;
 
 	Core::Shader_Loader shaderLoader;
-	Core::RenderContext shipContext;
 	Core::RenderContext sphereContext;
 
 	void loadModelToContext(std::string path, Core::RenderContext& context)
@@ -80,7 +79,6 @@ public:
 		programSun = shaderLoader.CreateProgram("shaders/shader_5_sun.vert", "shaders/shader_5_sun.frag");
 
 		loadModelToContext("./models/sphere.obj", sphereContext);
-		loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 
 		sunTexture = Core::LoadTexture("textures/planets/8k_sun.jpg");
 
