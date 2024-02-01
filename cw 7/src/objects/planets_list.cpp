@@ -48,6 +48,8 @@ private:
 	GLuint programSun;
 	GLuint programTex;
 	GLuint programEarth;
+	GLuint programPBR;
+	GLuint programNewPBR;
 
 	Core::Shader_Loader shaderLoader;
 	Core::RenderContext shipContext;
@@ -78,6 +80,10 @@ public:
 		programTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex_copy.vert", "shaders/shader_5_1_tex_copy.frag");
 		programEarth = shaderLoader.CreateProgram("shaders/shader_earth.vert", "shaders/shader_earth.frag");
 		programSun = shaderLoader.CreateProgram("shaders/shader_5_sun.vert", "shaders/shader_5_sun.frag");
+		programPBR = shaderLoader.CreateProgram("shaders/shader_pbr.vert", "shaders/shader_pbr.frag");
+		programNewPBR = shaderLoader.CreateProgram("shaders/PBR.vert", "shaders/PBR.frag");
+
+
 
 		loadModelToContext("./models/sphere.obj", sphereContext);
 		loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
@@ -116,26 +122,29 @@ public:
 		Sun* sun = new Sun("sun", programSun, sphereContext, SpaceObjectsList::sunTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("sun", sun));
 
-		CloudedPlanet* earth = new CloudedPlanet("earth", programEarth, sphereContext, SpaceObjectsList::earthTexture, SpaceObjectsList::earthNormalTexture, SpaceObjectsList::earthCloudsTexture);
-		spaceObjectsList.push_back(SpaceObjectProperties("earth", earth));
+		//CloudedPlanet* earth = new CloudedPlanet("earth", programEarth, sphereContext, SpaceObjectsList::earthTexture, SpaceObjectsList::earthNormalTexture, SpaceObjectsList::earthCloudsTexture);
+		//spaceObjectsList.push_back(SpaceObjectProperties("earth", earth));
 
-		Planet* moon = new Planet("moon", programTex, sphereContext, SpaceObjectsList::moonTexture, SpaceObjectsList::moonNormalTexture);
+		Planet* moon = new Planet("moon", programNewPBR, sphereContext, SpaceObjectsList::moonTexture, SpaceObjectsList::moonNormalTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("moon", moon));
 
-		Planet* mars = new Planet("mars", programTex, sphereContext, SpaceObjectsList::marsTexture, SpaceObjectsList::marsNormalTexture);
+		Planet* mars = new Planet("mars", programNewPBR, sphereContext, SpaceObjectsList::marsTexture, SpaceObjectsList::marsNormalTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("mars", mars));
 
-		CloudedPlanet* aliensPlanet = new CloudedPlanet("aliensPlanet", programEarth, sphereContext, SpaceObjectsList::aliensPlanetTexture, SpaceObjectsList::aliensPlanetNormalTexture, SpaceObjectsList::aliensPlanetCloudsTexture);
-		spaceObjectsList.push_back(SpaceObjectProperties("aliensPlanet", aliensPlanet));
+		//CloudedPlanet* aliensPlanet = new CloudedPlanet("aliensPlanet", programNewPBR, sphereContext, SpaceObjectsList::aliensPlanetTexture, SpaceObjectsList::aliensPlanetNormalTexture, SpaceObjectsList::aliensPlanetCloudsTexture);
+		//spaceObjectsList.push_back(SpaceObjectProperties("aliensPlanet", aliensPlanet));
 
-		Planet* venus = new Planet("venus", programTex, sphereContext, SpaceObjectsList::venusTexture, SpaceObjectsList::venusNormalTexture);
+		Planet* venus = new Planet("venus", programNewPBR, sphereContext, SpaceObjectsList::venusTexture, SpaceObjectsList::venusNormalTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("venus", venus));
 
-		Planet* humea = new Planet("humea", programTex, sphereContext, SpaceObjectsList::haumeaTexture, SpaceObjectsList::haumeaNormalTexture);
+		Planet* humea = new Planet("humea", programNewPBR, sphereContext, SpaceObjectsList::haumeaTexture, SpaceObjectsList::haumeaNormalTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("humea", humea));
 
-		Planet* mercury = new Planet("mercury", programTex, sphereContext, SpaceObjectsList::mercuryTexture, SpaceObjectsList::mercuryNormalTexture);
+		Planet* mercury = new Planet("mercury", programNewPBR, sphereContext, SpaceObjectsList::mercuryTexture, SpaceObjectsList::mercuryNormalTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("mercury", mercury));
+
+		Planet* earth = new Planet("earth", programNewPBR, sphereContext, SpaceObjectsList::earthTexture, SpaceObjectsList::earthNormalTexture);
+		spaceObjectsList.push_back(SpaceObjectProperties("earth", earth));
 	}
 
 	void updateTime(float newTime) {

@@ -39,6 +39,32 @@ public:
 		Core::DrawContext(context);
 		glUseProgram(0);
 	}
+	void drawObjectPBR(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix, float roughness, float metallic,
+		glm::vec3 lightColor, float lightPower, glm::vec3 cameraPos, glm::mat4 startPlanetPos, glm::vec3 spotlightPos, glm::vec3 spotlightConeDir) const override {
+		glUseProgram(program);
+		glm::vec3 sunDir = glm::vec3(1.f, 0.f, 1.f);
+		glm::vec3 sunPos = glm::vec3(20.f, 0.f, 20.f);
+		Core::SetActiveTexture(texture, "colorTexture", program, 0);
+		glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+		glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
+		glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+
+		glUniform1f(glGetUniformLocation(program, "exposition"), lightPower);
+
+		glUniform1f(glGetUniformLocation(program, "roughness"), roughness);
+		glUniform1f(glGetUniformLocation(program, "metallic"), metallic);
+
+		glUniform3f(glGetUniformLocation(program, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+
+		glUniform3f(glGetUniformLocation(program, "sunDir"), sunDir.x, sunDir.y, sunDir.z);
+		glUniform3f(glGetUniformLocation(program, "sunColor"), lightColor.x, lightColor.y, lightColor.z);
+
+		glUniform3f(glGetUniformLocation(program, "lightPos"), sunPos.x, sunPos.y, sunPos.z);
+		glUniform3f(glGetUniformLocation(program, "lightColor"), lightColor.x, lightColor.y, lightColor.z);
+
+		Core::DrawContext(context);
+		glUseProgram(0);
+	}
 	GLuint getTexture() const override { return this->texture; };
 	GLuint getNormals() const override { return this->normals; };
 	GLuint getProgram() const override { return this->program; };
