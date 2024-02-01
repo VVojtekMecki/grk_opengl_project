@@ -47,9 +47,6 @@ private:
 	}
 
 public:
-	int asteroidPositions[100][3];
-	GLuint asteroidTextures[100];
-
 	std::vector<Asteroid*> objectsList;
 
 	AsteroidsList() {}
@@ -80,12 +77,7 @@ public:
 				}
 			}
 
-			asteroidPositions[asteroid][0] = positionX;
-			asteroidPositions[asteroid][1] = positionY;
-			asteroidPositions[asteroid][2] = positionZ;
-			asteroidTextures[asteroid] = getRandomAsteroidTexture();
-
-			Asteroid* object = new Asteroid(std::to_string(asteroid), programTex, asteroidContext, asteroidTextures[asteroid], asteroidNormal, positionX, positionY, positionZ);
+			Asteroid* object = new Asteroid(std::to_string(asteroid), programTex, asteroidContext, getRandomAsteroidTexture(), asteroidNormal, positionX, positionY, positionZ);
 
 			objectsList.push_back(object);
 
