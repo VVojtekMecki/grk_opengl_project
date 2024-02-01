@@ -19,6 +19,7 @@
 #include "objects/planets_list.cpp"
 #include "objects/player_ship.cpp"
 #include "objects/skybox.h"
+using namespace std;
 
 GLuint program;
 
@@ -30,6 +31,41 @@ glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
 glm::vec3 spaceshipPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 spaceshipDir = glm::vec3(1.f, 0.f, 0.f);
 GLuint VAO,VBO;
+
+namespace texture {
+	GLuint asteroid_grey;
+	GLuint asteroid_red;
+	GLuint asteroidNormal;
+}
+GLuint programTex;
+
+GLuint asteroidVAO;
+GLuint asteroidVBO; // Буфер вершин
+GLuint asteroidEBO; // Буфер индексов
+GLsizei asteroidIndicesCount;
+
+int positionX, positionY, positionZ = 0;
+const int amountAsteroids = 100;
+
+int asteroidPositions[amountAsteroids][3];
+GLuint asteroidTextures[amountAsteroids];
+
+GLuint asteroidTexture;
+Core::RenderContext asteroidContext;
+
+
+
+GLuint getRandomAsteroidTexture() {
+	int randomIndex = std::rand() % 2;
+	return (randomIndex == 0) ? texture::asteroid_grey : texture::asteroid_red;
+
+}
+
+
+int getRandomNumber(int min, int max) {
+	int randomNumber = rand() % (max - min + 1) + min;
+	return randomNumber;
+}
 
 float aspectRatio = 1.f;
 
@@ -75,6 +111,45 @@ glm::mat4 createPerspectiveMatrix()
 	return perspectiveMatrix;
 }
 
+void drawObjectColor(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color, int instanceCount) {
+
+	glUseProgram(program);
+	glBindVertexArray(asteroidVAO);
+
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+	glUniform3f(glGetUniformLocation(program, "color"), color.x, color.y, color.z);
+	glUniform3f(glGetUniformLocation(program, "lightPos"), 0, 0, 0);
+
+	glDrawElementsInstanced(GL_TRIANGLES, asteroidIndicesCount, GL_UNSIGNED_INT, 0, instanceCount);
+	Core::DrawContext(context);
+	glUseProgram(0);
+
+}
+
+void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
+	glUseProgram(program);
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+	Core::SetActiveTexture(textureID, "tex", program, 0);
+	Core::SetActiveTexture(normalmapId, "normalSampler", program, 1);
+
+	Core::DrawContext(context);
+	glUseProgram(0);
+}
+
+void drawAsteroid(Core::RenderContext& asteroidContext, float scale, float rotationSpeed, const glm::vec3& translate, float time, int instanceCount) {
+	glm::mat4 asteroidScale = glm::scale(glm::vec3(scale));
+	glm::mat4 asteroidRotate = glm::rotate(time * rotationSpeed, glm::vec3(0, 1, 0));
+	glm::mat4 asteroidTranslate = glm::translate(translate);
+
+	drawObjectColor(asteroidContext, asteroidScale * asteroidRotate * asteroidTranslate, glm::vec3(0.50, 0.5, 0.5), instanceCount);
+}
+
 SpaceObjectsList spaceObjectsList(glfwGetTime(), createPerspectiveMatrix()* createCameraMatrix());
 
 PlayerShip player;
@@ -87,10 +162,10 @@ void renderScene(GLFWwindow* window)
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glm::mat4 transformation;
-	float time = glfwGetTime();
-	deltaTime = time - lastFrameTime;
+	float timeGl = glfwGetTime();
+	deltaTime = timeGl - lastFrameTime;
 	deltaTime = glm::min(deltaTime, 0.1f);
-	lastFrameTime = time;
+	lastFrameTime = timeGl;
 
 	//spaceObjectsList.updateTime(time);
 	
@@ -104,13 +179,13 @@ void renderScene(GLFWwindow* window)
 
 	std::map<std::string, glm::mat4> modelMatrixMap = {
 		{ "sun", glm::mat4() * glm::scale(glm::vec3(4.f)) },
-		{ "earth", glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
-		{ "moon", glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)) },
-		{ "mars", glm::eulerAngleY((time + 6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f))},
-		{ "aliensPlanet", glm::eulerAngleY(time / 3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f))},
-		{ "venus", glm::eulerAngleY(time / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
-		{ "humea", glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f))},
-		{ "mercury", glm::eulerAngleY(time / 7) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f))}
+		{ "earth", glm::eulerAngleY(timeGl / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
+		{ "moon", glm::eulerAngleY(timeGl / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(timeGl) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)) },
+		{ "mars", glm::eulerAngleY((timeGl + 6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f))},
+		{ "aliensPlanet", glm::eulerAngleY(timeGl / 3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f))},
+		{ "venus", glm::eulerAngleY(timeGl / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
+		{ "humea", glm::eulerAngleY(timeGl / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f))},
+		{ "mercury", glm::eulerAngleY(timeGl / 7) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f))}
 	};
 
 	glm::mat4 projectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
@@ -118,6 +193,27 @@ void renderScene(GLFWwindow* window)
 	for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
 		obj.object->drawObjectTexture(projectionMatrix, modelMatrixMap.at(obj.name));
 	}
+
+
+
+
+	float position = -20.0f;
+
+	srand(static_cast<unsigned>(time(0)));
+	for (int asteroid = 0; asteroid < amountAsteroids; asteroid++) {
+		positionX = asteroidPositions[asteroid][0];
+		positionY = asteroidPositions[asteroid][1];
+		positionZ = asteroidPositions[asteroid][2];
+
+		glm::mat4 asteroid1Scale = glm::scale(glm::vec3(0.5f));
+		glm::mat4 asteroid1Rotate = glm::rotate(timeGl * 0.05f, glm::vec3(0, 1, 0));
+		glm::mat4 asteroid1Translate = glm::translate(glm::vec3(positionX, positionY, positionZ));
+		drawObjectTexture(programTex, asteroidContext, asteroid1Scale * asteroid1Rotate * asteroid1Translate, asteroidTextures[asteroid], texture::asteroidNormal);
+	}
+
+
+
+
 
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::normalize(glm::cross(spaceshipSide, spaceshipDir));
@@ -162,9 +258,39 @@ void init(GLFWwindow* window)
 
 	glEnable(GL_DEPTH_TEST);
 	program = shaderLoader.CreateProgram("shaders/shader_5_1.vert", "shaders/shader_5_1.frag");
+	programTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex_copy.vert", "shaders/shader_5_1_tex_copy.frag");
 
-	spaceObjectsList.init();
-	player.init();
+	loadModelToContext("./models/asteroid.obj", asteroidContext);
+
+	texture::asteroid_grey = Core::LoadTexture("textures/asteroids/4k_haumea_fictional.jpg");
+	texture::asteroid_red = Core::LoadTexture("textures/asteroids/4k_makemake_fictional.jpg");
+	texture::asteroidNormal = Core::LoadTexture("textures/asteroids/asteroid_normal.jpg");
+
+	srand(static_cast<unsigned>(time(0)));
+	for (int asteroid = 0; asteroid < amountAsteroids; asteroid++) {
+		positionX = getRandomNumber(-65, 65);
+		positionY = getRandomNumber(-35, 35);
+		positionZ = getRandomNumber(-35, 35);
+
+		bool truePositionZ = false;
+		if (positionY > -8 && positionY < 8) {
+			while (truePositionZ != true) {
+				if (positionZ < -8 || positionZ > 8) {
+					truePositionZ = true;
+					break;
+				}
+				positionZ = getRandomNumber(-35, 35);
+			}
+		}
+
+		asteroidPositions[asteroid][0] = positionX;
+		asteroidPositions[asteroid][1] = positionY;
+		asteroidPositions[asteroid][2] = positionZ;
+		asteroidTextures[asteroid] = getRandomAsteroidTexture();
+
+		spaceObjectsList.init();
+		player.init();
+	}
 }
 
 void shutdown(GLFWwindow* window)
