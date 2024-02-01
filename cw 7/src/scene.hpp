@@ -31,7 +31,6 @@ glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
 glm::vec3 spaceshipPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 spaceshipDir = glm::vec3(1.f, 0.f, 0.f);
 GLuint VAO,VBO;
-GLuint programTex;
 
 float aspectRatio = 1.f;
 
@@ -171,7 +170,6 @@ void init(GLFWwindow* window)
 
 	glEnable(GL_DEPTH_TEST);
 	program = shaderLoader.CreateProgram("shaders/shader_5_1.vert", "shaders/shader_5_1.frag");
-	programTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex_copy.vert", "shaders/shader_5_1_tex_copy.frag");
 
 	spaceObjectsList.init();
 	asteroidsList.init();
