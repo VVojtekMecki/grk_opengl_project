@@ -3,6 +3,7 @@
 #include "../Shader_Loader.h"
 #include "../Render_Utils.h"
 #include "../Texture.h"
+#include <GLFW/glfw3.h>
 
 #ifndef SPACE_OBJECT_H
 #define SPACE_OBJECT_H
@@ -59,6 +60,33 @@ class Planet : public SpaceObject {
 
 #endif
 
+#ifndef CLOUDS_ANIMATION_PLANET_H
+#define CLOUDS_ANIMATION_PLANET_H
+
+class CloudsAnimationPlanet : public Planet {
+private:
+
+public:
+	CloudsAnimationPlanet(std::string name, GLuint program, Core::RenderContext& context, GLuint texture, GLuint normals)
+		: Planet(name, program, context, texture, normals) {}
+
+	void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const override {
+
+		float time = glfwGetTime();
+
+		glUseProgram(program);
+		glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+		glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
+		glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+		glUniform1f(glGetUniformLocation(program, "u_time"), time);
+
+		Core::DrawContext(context);
+		glUseProgram(0);
+	}
+};
+
+#endif
+
 #ifndef CLOUDED_PLANET_H
 #define CLOUDED_PLANET_H
 
@@ -83,14 +111,10 @@ public:
 		Core::DrawContext(context);
 		glUseProgram(0);
 	}
-	GLuint getTexture() const override { return this->texture; };
-	GLuint getNormals() const override { return this->normals; };
-	GLuint getProgram() const override { return this->program; };
-	Core::RenderContext& getContext() const override { return this->context; };
-	glm::mat4 getModelMatrix() const override { return this->modelMatrix; };
 };
 
 #endif
+
 
 #ifndef SUN_H
 #define SUN_H

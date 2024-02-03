@@ -10,7 +10,7 @@
 class AsteroidsList {
 
 private:
-	int amountAsteroids = 100;
+	int amountAsteroids = 200;
 	int positionX, positionY, positionZ = 0;
 	
 	GLuint asteroidGreyTexture;
@@ -67,7 +67,7 @@ public:
 			positionZ = getRandomNumber(-35, 35);
 
 			bool truePositionZ = false;
-			if (positionY > -8 && positionY < 8) {
+			if (positionY > -16 && positionY < 16) {
 				while (truePositionZ != true) {
 					if (positionZ < -8 || positionZ > 8) {
 						truePositionZ = true;

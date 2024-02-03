@@ -1,5 +1,6 @@
 #include "space_objects.h"
 #include <map>
+#include <GLFW/glfw3.h>
 
 class SpaceObjectProperties {
 public:
@@ -14,6 +15,9 @@ public:
 
 class SpaceObjectsList {
 private:
+	GLuint emptyTexture;
+	GLuint emptyNormals;
+
 	GLuint earthTexture;
 	GLuint earthNormalTexture;
 	GLuint earthCloudsTexture;
@@ -48,6 +52,7 @@ private:
 	GLuint programSun;
 	GLuint programTex;
 	GLuint programEarth;
+	GLuint programCloudsAnimation;
 
 	Core::Shader_Loader shaderLoader;
 	Core::RenderContext sphereContext;
@@ -77,6 +82,7 @@ public:
 		programTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex_copy.vert", "shaders/shader_5_1_tex_copy.frag");
 		programEarth = shaderLoader.CreateProgram("shaders/shader_earth.vert", "shaders/shader_earth.frag");
 		programSun = shaderLoader.CreateProgram("shaders/shader_5_sun.vert", "shaders/shader_5_sun.frag");
+		programCloudsAnimation = shaderLoader.CreateProgram("shaders/clouds_noise.vert", "shaders/clouds_noise.frag");
 
 		loadModelToContext("./models/sphere.obj", sphereContext);
 
@@ -134,9 +140,12 @@ public:
 
 		Planet* mercury = new Planet("mercury", programTex, sphereContext, SpaceObjectsList::mercuryTexture, SpaceObjectsList::mercuryNormalTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("mercury", mercury));
+
+		CloudsAnimationPlanet* cloudsAnimation = new CloudsAnimationPlanet("cloudsAnimation", programCloudsAnimation, sphereContext, emptyTexture, emptyNormals);
+		spaceObjectsList.push_back(SpaceObjectProperties("cloudsAnimation", cloudsAnimation));
 	}
 
-	void updateTime(float newTime) {
-		this->time = newTime;
+	void updateTime() {
+		this->time = glfwGetTime();
 	}
 };
