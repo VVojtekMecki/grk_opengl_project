@@ -8,7 +8,7 @@ uniform sampler2D depthMap;
 uniform vec3 cameraPos;
 
 uniform sampler2D colorTexture;
-
+uniform sampler2D normalSampler; 
 uniform vec3 sunDir;
 uniform vec3 sunColor;
 
@@ -23,7 +23,7 @@ uniform float exposition;
 in vec3 vecNormal;
 in vec3 worldPos;
 in vec2 vtc;
-
+in vec2 fragTexCoord;
 out vec4 outColor;
 
 in vec3 viewDirTS;
@@ -106,11 +106,15 @@ vec3 toneMapping(vec3 color)
 
 void main()
 {
-    vec3 normal = normalize(vecNormal);
+    //vec3 normal = normalize(vecNormal);
+    vec4 N = texture(normalSampler, fragTexCoord);
+    vec3 normal = normalize((N*2.0-1.0).xyz);
 
-    vec3 viewDir = normalize(cameraPos - worldPos);
+    vec3 viewDir = normalize(viewDirTS);
+    //vec3 viewDir = normalize(cameraPos - worldPos);
 
-	vec3 lightDir = normalize(lightPos - worldPos);
+	vec3 lightDir = normalize(lightDirTS);
+    //vec3 lightDir = normalize(lightPos - worldPos);
 
     vec4 textureColor = texture2D(colorTexture, vtc);
 

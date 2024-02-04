@@ -40,7 +40,7 @@ float aspectRatio = 1.f;
 float lastFrameTime = 0.0f;
 float deltaTime = 0.0f;
 float planetRough = 0.5f;
-float planetMetal = 0.5f;
+float planetMetal = 1.5f;
 float lightPower = 10.f;
 glm::vec3 lightColor = glm::vec3(lightPower, lightPower, lightPower);
 
@@ -111,9 +111,9 @@ void renderScene(GLFWwindow* window)
 
 	std::map<std::string, glm::mat4> modelMatrixMap = {
 		{ "sun", glm::mat4() * glm::scale(glm::vec3(4.f)) },
-		{ "earth", glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
+		{ "earth", glm::eulerAngleY(time / 30) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
 		{ "moon", glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)) },
-		{ "mars", glm::eulerAngleY((time + 6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f))},
+		{ "mars", glm::eulerAngleY((time + 6) / 30) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f))},
 		{ "aliensPlanet", glm::eulerAngleY(time / 3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f))},
 		{ "venus", glm::eulerAngleY(time / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
 		{ "humea", glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f))},
@@ -121,9 +121,9 @@ void renderScene(GLFWwindow* window)
 	};
 	std::map<std::string, glm::mat4> startPlanetPosition = {
 		{ "sun", glm::mat4()},
-		{ "earth",glm::eulerAngleY(time / 3)},
+		{ "earth",glm::eulerAngleY(time / 30)},
 		{ "moon",  glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(time)},
-		{ "mars", glm::eulerAngleY((time + 6) / 3)},
+		{ "mars", glm::eulerAngleY((time + 6) / 30)},
 		{ "aliensPlanet", glm::eulerAngleY(time / 3.3f)},
 		{ "venus", glm::eulerAngleY(time / 4)},
 		{ "humea", glm::eulerAngleY(time / 5)},
@@ -134,10 +134,16 @@ void renderScene(GLFWwindow* window)
 	//for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
 	//	obj.object->drawObjectTexture(projectionMatrix, modelMatrixMap.at(obj.name));
 	//}
+	// 
 	for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
 		obj.object->drawObjectPBR(projectionMatrix, modelMatrixMap.at(obj.name), planetRough, planetMetal, lightColor, lightPower, cameraPos, 
 			startPlanetPosition.at(obj.name), spotlightPos, spotlightConeDir);
 	}
+
+	//for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
+	//	obj.object->drawWithPBR(projectionMatrix, modelMatrixMap.at(obj.name), planetRough, planetMetal, lightColor, lightPower, cameraPos,
+	//		startPlanetPosition.at(obj.name), spotlightPos, spotlightConeDir);
+	//}
 
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::normalize(glm::cross(spaceshipSide, spaceshipDir));
@@ -220,7 +226,7 @@ void processInput(GLFWwindow* window)
 		spaceshipDir = glm::vec3(glm::eulerAngleY(-angleSpeed) * glm::vec4(spaceshipDir, 0));
 	//jasno??
 	float powerSpeed = 0.05f;
-
+	
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && lightPower < 25.f)
 		lightPower += powerSpeed;
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && lightPower > 2.5f)

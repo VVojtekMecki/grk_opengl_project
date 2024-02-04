@@ -25,14 +25,14 @@ uniform float roughness;
 uniform float exposition;
 
 uniform sampler2D texture1;
-//uniform sampler2D texture2;
+uniform sampler2D texture2;
 uniform sampler2D textureNormal;
 
 
 in vec3 vecNormal;
 in vec3 worldPos;
 in vec2 fragTexCoord;
-in vec2 vtc;
+
 out vec4 outColor;
 
 
@@ -107,12 +107,7 @@ vec3 PBRLight(vec3 lightDir, vec3 radiance, vec3 normal, vec3 V, vec3 color){
 
 
 
-vec3 toneMapping(vec3 color)
-{
-	float exposure = 0.03;
-	vec3 mapped = 1 - exp(-color * exposure);
-	return mapped;
-}
+
 
 
 void main()
@@ -120,13 +115,19 @@ void main()
     
     vec4 texture1Color = texture(texture1, fragTexCoord);
     //UNCOMMENT IF YOU WANT MIX 2 TEXTURES
-    //vec4 texture2Color = texture(texture2, fragTexCoord);
+    vec4 texture2Color = texture(texture2, fragTexCoord);
 
     vec4 N = texture(textureNormal, fragTexCoord);
     vec3 normal = normalize((N*2.0-1.0).xyz);
 
-    //UNCOMMENT IF YOU WANT MIX 2 TEXTURES
-    //vec3 color = mix(vec3(1.0), texture1Color.rgb, texture2Color.r*4);
+
+    //COMMENT TO USE 2 TEXTURES
+    //vec3 color = texture1Color.rgb;
+
+    //finalColor = mix(finalColor, asteroidColor.rgb, 0.3);
+    //vec3 finalColor = mix(vec3(1.0), texture.rgb, rustColor.r) + asteroidColor.rgb * 0.2;
+	//vec3 normal = vec3(0,0,1);
+    //vec3 normal = normalize(vecNormal);
 
     vec3 viewDir = normalize(viewDirTS);
     //vec3 viewDir = normalize(cameraPos-worldPos);
@@ -134,28 +135,11 @@ void main()
 	vec3 lightDir = normalize(lightDirTS);
     //vec3 lightDir = normalize(lightPos-worldPos);
 
-    //COMMENT TO USE 2 TEXTURES
-    vec3 finalColor = texture1Color.rgb;
+    //UNCOMMENT IF YOU WANT MIX 2 TEXTURES
+    vec3 finalColor = mix(vec3(1.0), texture1Color.rgb, texture2Color.r);
     float diffuse = max(0, dot(normal, lightDir));
-    vec3 color = ((finalColor * min(1, AMBIENT + diffuse))*3).rgb;
+    vec3 color = ((finalColor * min(1, AMBIENT + diffuse))).rgb;
 
-
-    //finalColor = mix(finalColor, asteroidColor.rgb, 0.3);
-    //vec3 finalColor = mix(vec3(1.0), texture.rgb, rustColor.r) + asteroidColor.rgb * 0.2;
-	//vec3 normal = vec3(0,0,1);
-    //vec3 normal = normalize(vecNormal);
-
-
-
-    
-
-
-
-
-    //vec4 textureColor = texture2D(texture1, vtc);
-    //float diffuse = max(0, dot(normal, lightDir));
-    //vec3 distance = lightColor / pow(length(lightPos - worldPos), 2.0) * 300;
-    //vec3 color = toneMapping(vec3(textureColor)* min(1, AMBIENT + diffuse) * distance);
 
 	vec3 ambient = AMBIENT*color;
 	vec3 attenuatedlightColor = lightColor/pow(length(lightPos-worldPos),2);

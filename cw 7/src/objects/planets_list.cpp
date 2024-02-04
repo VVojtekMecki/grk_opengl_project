@@ -50,6 +50,7 @@ private:
 	GLuint programEarth;
 	GLuint programPBR;
 	GLuint programNewPBR;
+	GLuint programOliwiaPBR;
 
 	Core::Shader_Loader shaderLoader;
 	Core::RenderContext shipContext;
@@ -80,8 +81,10 @@ public:
 		programTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex_copy.vert", "shaders/shader_5_1_tex_copy.frag");
 		programEarth = shaderLoader.CreateProgram("shaders/shader_earth.vert", "shaders/shader_earth.frag");
 		programSun = shaderLoader.CreateProgram("shaders/shader_5_sun.vert", "shaders/shader_5_sun.frag");
-		programPBR = shaderLoader.CreateProgram("shaders/shader_pbr.vert", "shaders/shader_pbr.frag");
+		programPBR = shaderLoader.CreateProgram("shaders/PBRforEarth.vert", "shaders/PBRforEarth.frag");
 		programNewPBR = shaderLoader.CreateProgram("shaders/PBR.vert", "shaders/PBR.frag");
+		programOliwiaPBR = shaderLoader.CreateProgram("shaders/shader_pbr.vert", "shaders/shader_pbr.frag");
+
 
 
 
@@ -122,8 +125,30 @@ public:
 		Sun* sun = new Sun("sun", programSun, sphereContext, SpaceObjectsList::sunTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("sun", sun));
 
-		//CloudedPlanet* earth = new CloudedPlanet("earth", programEarth, sphereContext, SpaceObjectsList::earthTexture, SpaceObjectsList::earthNormalTexture, SpaceObjectsList::earthCloudsTexture);
+		//CloudedPlanet* earth = new CloudedPlanet("earth", programPBR, sphereContext, SpaceObjectsList::earthTexture, SpaceObjectsList::earthNormalTexture, SpaceObjectsList::earthCloudsTexture);
 		//spaceObjectsList.push_back(SpaceObjectProperties("earth", earth));
+
+		//Planet* moon = new Planet("moon", programNewPBR, sphereContext, SpaceObjectsList::moonTexture, SpaceObjectsList::moonNormalTexture);
+		//spaceObjectsList.push_back(SpaceObjectProperties("moon", moon));
+
+		//Planet* mars = new Planet("mars", programNewPBR, sphereContext, SpaceObjectsList::marsTexture, SpaceObjectsList::marsNormalTexture);
+		//spaceObjectsList.push_back(SpaceObjectProperties("mars", mars));
+
+		//CloudedPlanet* aliensPlanet = new CloudedPlanet("aliensPlanet", programPBR, sphereContext, SpaceObjectsList::aliensPlanetTexture, SpaceObjectsList::aliensPlanetNormalTexture, SpaceObjectsList::aliensPlanetCloudsTexture);
+		//spaceObjectsList.push_back(SpaceObjectProperties("aliensPlanet", aliensPlanet));
+
+		//Planet* venus = new Planet("venus", programNewPBR, sphereContext, SpaceObjectsList::venusTexture, SpaceObjectsList::venusNormalTexture);
+		//spaceObjectsList.push_back(SpaceObjectProperties("venus", venus));
+
+		//Planet* humea = new Planet("humea", programNewPBR, sphereContext, SpaceObjectsList::haumeaTexture, SpaceObjectsList::haumeaNormalTexture);
+		//spaceObjectsList.push_back(SpaceObjectProperties("humea", humea));
+
+		//Planet* mercury = new Planet("mercury", programNewPBR, sphereContext, SpaceObjectsList::mercuryTexture, SpaceObjectsList::mercuryNormalTexture);
+		//spaceObjectsList.push_back(SpaceObjectProperties("mercury", mercury));
+
+		//-----------------------------
+		CloudedPlanet* earth = new CloudedPlanet("earth", programPBR, sphereContext, SpaceObjectsList::earthTexture, SpaceObjectsList::earthNormalTexture, SpaceObjectsList::earthCloudsTexture);
+		spaceObjectsList.push_back(SpaceObjectProperties("earth", earth));
 
 		Planet* moon = new Planet("moon", programNewPBR, sphereContext, SpaceObjectsList::moonTexture, SpaceObjectsList::moonNormalTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("moon", moon));
@@ -131,7 +156,7 @@ public:
 		Planet* mars = new Planet("mars", programNewPBR, sphereContext, SpaceObjectsList::marsTexture, SpaceObjectsList::marsNormalTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("mars", mars));
 
-		//CloudedPlanet* aliensPlanet = new CloudedPlanet("aliensPlanet", programNewPBR, sphereContext, SpaceObjectsList::aliensPlanetTexture, SpaceObjectsList::aliensPlanetNormalTexture, SpaceObjectsList::aliensPlanetCloudsTexture);
+		//CloudedPlanet* aliensPlanet = new CloudedPlanet("aliensPlanet", programPBR, sphereContext, SpaceObjectsList::aliensPlanetTexture, SpaceObjectsList::aliensPlanetNormalTexture, SpaceObjectsList::aliensPlanetCloudsTexture);
 		//spaceObjectsList.push_back(SpaceObjectProperties("aliensPlanet", aliensPlanet));
 
 		Planet* venus = new Planet("venus", programNewPBR, sphereContext, SpaceObjectsList::venusTexture, SpaceObjectsList::venusNormalTexture);
@@ -143,8 +168,8 @@ public:
 		Planet* mercury = new Planet("mercury", programNewPBR, sphereContext, SpaceObjectsList::mercuryTexture, SpaceObjectsList::mercuryNormalTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("mercury", mercury));
 
-		Planet* earth = new Planet("earth", programNewPBR, sphereContext, SpaceObjectsList::earthTexture, SpaceObjectsList::earthNormalTexture);
-		spaceObjectsList.push_back(SpaceObjectProperties("earth", earth));
+		//Planet* earth = new Planet("earth", programNewPBR, sphereContext, SpaceObjectsList::earthTexture, SpaceObjectsList::earthNormalTexture);
+		//spaceObjectsList.push_back(SpaceObjectProperties("earth", earth));
 	}
 
 	void updateTime(float newTime) {

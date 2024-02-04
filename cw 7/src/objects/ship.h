@@ -24,8 +24,39 @@ public:
 		rust = Core::LoadTexture("textures/spaceship/rust.png");
 		shipScratches = Core::LoadTexture("textures/spaceship/scratches.png");
 	}
+	void drawWithPBR(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix, float roughness, float metallic,
+		glm::vec3 lightColor, float lightPower, glm::vec3 cameraPos, glm::mat4 startPlanetPos, glm::vec3 spotlightPos, glm::vec3 spotlightConeDir) const  {
+		glUseProgram(program);
+		glm::vec3 sunPos = glm::vec3();
+		glm::vec3 sunColor = glm::vec3(0.9f, 0.9f, 0.7f)/*   *5  */;
+		glm::vec3 pointlightPos = glm::vec3(0, 2, 0);
+		glm::vec3 pointlightColor = glm::vec3(0.9, 0.6, 0.6);
+		glm::vec3 spotlightColor = glm::vec3(0.4, 0.4, 0.9) /* * 3  */;
+		float spotlightPhi = 3.14 / 4;
+		glm::vec3 sunPosition = startPlanetPos * glm::vec4(1.f, 0.0f, 0.f, 1.f);
+		glm::vec3 sunDir = glm::normalize(-sunPosition);
+		Core::SetActiveTexture(texture, "colorTexture", program, 0);
+		glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+		glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
+		glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
 
-	void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const override {
+		glUniform1f(glGetUniformLocation(program, "exposition"), lightPower);
+
+		glUniform1f(glGetUniformLocation(program, "roughness"), roughness);
+		glUniform1f(glGetUniformLocation(program, "metallic"), metallic);
+
+		glUniform3f(glGetUniformLocation(program, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+
+		glUniform3f(glGetUniformLocation(program, "sunDir"), sunDir.x, sunDir.y, sunDir.z);
+		glUniform3f(glGetUniformLocation(program, "sunColor"), lightColor.x, lightColor.y, lightColor.z);
+
+		glUniform3f(glGetUniformLocation(program, "lightPos"), sunPos.x, sunPos.y, sunPos.z);
+		glUniform3f(glGetUniformLocation(program, "lightColor"), lightColor.x, lightColor.y, lightColor.z);
+
+		Core::DrawContext(context);
+		glUseProgram(0);
+	}
+	void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const  {
 		glUseProgram(program);
 		glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 		glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);

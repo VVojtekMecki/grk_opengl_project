@@ -11,6 +11,7 @@ uniform mat4 modelMatrix;
 
 out vec3 vecNormal;
 out vec3 worldPos;
+out vec2 vtc;
 
 uniform vec3 lightPos;
 uniform vec3 spotlightPos;
@@ -30,6 +31,8 @@ void main()
 	vecNormal = (modelMatrix* vec4(vertexNormal,0)).xyz;
 	gl_Position = transformation * vec4(vertexPosition, 1.0);
 	
+	vtc = vec2(vertexTexCoord.x, 1.0 - vertexTexCoord.y);
+
 	vec3 w_tangent = normalize(mat3(modelMatrix)*vertexTangent);
 	vec3 w_bitangent = normalize(mat3(modelMatrix)*vertexBitangent);
 	mat3 TBN = transpose(mat3(w_tangent, w_bitangent, vecNormal));
