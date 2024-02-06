@@ -31,7 +31,7 @@ public:
 
 	void init() {
 		programShip = shaderLoader.CreateProgram("shaders/shader_ship.vert", "shaders/shader_ship.frag");
-		programPBR = shaderLoader.CreateProgram("shaders/PBR.vert", "shaders/PBR.frag");
+		programPBR = shaderLoader.CreateProgram("shaders/PBRforEarth.vert", "shaders/PBRforEarth.frag");
 
 		loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 

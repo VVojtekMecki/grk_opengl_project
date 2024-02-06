@@ -36,7 +36,9 @@ public:
 		glm::vec3 sunPos = glm::vec3();
 		glm::vec3 sunDir = glm::normalize(startPlanetPos - sunPos);
 		Core::SetActiveTexture(texture, "texture1", program, 0);
-		Core::SetActiveTexture(normals, "textureNormal", program, 1);
+		Core::SetActiveTexture(texture, "texture2", program, 1);
+		Core::SetActiveTexture(normals, "textureNormal", program, 2);
+
 
 		glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 		glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
