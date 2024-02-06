@@ -43,6 +43,10 @@
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\PBR.frag" />
+    <None Include="shaders\PBR.vert" />
+    <None Include="shaders\PBRforEarth.frag" />
+    <None Include="shaders\PBRforEarth.vert" />
     <None Include="shaders\shader_5_1.frag" />
     <None Include="shaders\shader_5_1.vert" />
     <None Include="shaders\shader_5_1_tex.frag" />
@@ -53,6 +57,8 @@
     <None Include="shaders\shader_5_sun.vert" />
     <None Include="shaders\shader_earth.frag" />
     <None Include="shaders\shader_earth.vert" />
+    <None Include="shaders\shader_pbr.frag" />
+    <None Include="shaders\shader_pbr.vert" />
     <None Include="shaders\shader_ship.frag" />
     <None Include="shaders\shader_ship.vert" />
     <None Include="shaders\shader_skybox.frag" />

@@ -154,5 +154,23 @@
     <None Include="shaders\shader_skybox.frag">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="shaders\shader_pbr.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_pbr.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PBR.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PBR.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PBRforEarth.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PBRforEarth.frag">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
