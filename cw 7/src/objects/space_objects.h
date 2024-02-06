@@ -214,7 +214,7 @@ public:
 	Asteroid(std::string name, GLuint program, Core::RenderContext& context, GLuint texture, GLuint normals, int x, int y, int z)
 		: Planet(name, program, context, texture, normals),  posX(x), posY(y), posZ(z) {}
 
-	void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const override {
+	void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) {
 		glUseProgram(program);
 		glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 		glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
