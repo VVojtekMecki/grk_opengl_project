@@ -200,3 +200,40 @@ class Sun : public SpaceObject {
 };
 
 #endif
+
+#ifndef ASTEROID_H
+#define ASTEROID_H
+
+class Asteroid : public Planet {
+private:
+	int posX;
+	int posY;
+	int posZ;
+
+public:
+	Asteroid(std::string name, GLuint program, Core::RenderContext& context, GLuint texture, GLuint normals, int x, int y, int z)
+		: Planet(name, program, context, texture, normals),  posX(x), posY(y), posZ(z) {}
+
+	void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const override {
+		glUseProgram(program);
+		glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+		glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
+		glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+
+		Core::SetActiveTexture(texture, "texture", program, 0);
+		Core::SetActiveTexture(normals, "normalSampler", program, 1);
+
+		Core::DrawContext(context);
+		glUseProgram(0);
+	}
+
+	auto getPosition() const {
+		struct retVals {
+			int x, y, z;
+		};
+
+		return retVals{ this->posX, this->posY, this->posZ };
+	};
+};
+
+#endif

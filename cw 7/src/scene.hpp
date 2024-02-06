@@ -19,6 +19,7 @@
 #include "objects/planets_list.cpp"
 #include "objects/player_ship.cpp"
 #include "objects/skybox.h"
+#include "objects/asteroids_list.cpp"
 
 GLuint program;
 
@@ -43,7 +44,6 @@ float planetRough = 0.3f;
 float planetMetal = 0.3f;
 float lightPower = 25.f;
 glm::vec3 lightColor = glm::vec3(lightPower, lightPower, lightPower);
-
 
 glm::mat4 createCameraMatrix()
 {
@@ -84,6 +84,8 @@ glm::mat4 createPerspectiveMatrix()
 
 SpaceObjectsList spaceObjectsList(glfwGetTime(), createPerspectiveMatrix()* createCameraMatrix());
 
+AsteroidsList asteroidsList;
+
 PlayerShip player;
 
 Skybox skybox;
@@ -94,12 +96,10 @@ void renderScene(GLFWwindow* window)
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glm::mat4 transformation;
-	float time = glfwGetTime();
-	deltaTime = time - lastFrameTime;
+	float timeGl = glfwGetTime();
+	deltaTime = timeGl - lastFrameTime;
 	deltaTime = glm::min(deltaTime, 0.1f);
-	lastFrameTime = time;
-
-	//spaceObjectsList.updateTime(time);
+	lastFrameTime = timeGl;
 	
 
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix() * glm::translate(cameraPos);
@@ -111,13 +111,13 @@ void renderScene(GLFWwindow* window)
 
 	std::map<std::string, glm::mat4> modelMatrixMap = {
 		{ "sun", glm::mat4() * glm::scale(glm::vec3(4.f)) },
-		{ "earth", glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
-		{ "moon", glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)) },
-		{ "mars", glm::eulerAngleY((time + 6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f))},
-		{ "aliensPlanet", glm::eulerAngleY(time / 3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f))},
-		{ "venus", glm::eulerAngleY(time / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
-		{ "humea", glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f))},
-		{ "mercury", glm::eulerAngleY(time / 7) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f))},
+		{ "earth", glm::eulerAngleY(timeGl / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
+		{ "moon", glm::eulerAngleY(timeGl / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(timeGl) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)) },
+		{ "mars", glm::eulerAngleY((timeGl + 6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f))},
+		{ "aliensPlanet", glm::eulerAngleY(timeGl / 3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f))},
+		{ "venus", glm::eulerAngleY(timeGl / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
+		{ "humea", glm::eulerAngleY(timeGl / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f))},
+		{ "mercury", glm::eulerAngleY(timeGl / 7) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f))}
 	};
 
 	std::map<std::string, glm::vec3> startPlanetPosition = {
@@ -147,6 +147,14 @@ void renderScene(GLFWwindow* window)
 	for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
 		obj.object->drawWithPBR(projectionMatrix, modelMatrixMap.at(obj.name), planetRough, planetMetal, lightColor, lightPower, cameraPos, 
 			startPlanetPosition.at(obj.name), spotlightPos, spotlightConeDir);
+	}
+
+	for (Asteroid* obj : asteroidsList.objectsList) {
+		glm::mat4 asteroid1Scale = glm::scale(glm::vec3(0.5f));
+		glm::mat4 asteroid1Rotate = glm::rotate(timeGl * 0.05f, glm::vec3(0, 1, 0));
+		auto pos = obj->getPosition();
+		glm::mat4 asteroid1Translate = glm::translate(glm::vec3(pos.x, pos.y, pos.z));
+		obj->drawObjectTexture(projectionMatrix, asteroid1Scale*asteroid1Rotate * asteroid1Translate);
 	}
 
 	//for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
@@ -202,6 +210,7 @@ void init(GLFWwindow* window)
 	program = shaderLoader.CreateProgram("shaders/shader_5_1.vert", "shaders/shader_5_1.frag");
 
 	spaceObjectsList.init();
+	asteroidsList.init();
 	player.init();
 }
 

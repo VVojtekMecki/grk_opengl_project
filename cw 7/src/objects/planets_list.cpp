@@ -53,7 +53,6 @@ private:
 	GLuint programOliwiaPBR;
 
 	Core::Shader_Loader shaderLoader;
-	Core::RenderContext shipContext;
 	Core::RenderContext sphereContext;
 
 	void loadModelToContext(std::string path, Core::RenderContext& context)
@@ -89,7 +88,6 @@ public:
 
 
 		loadModelToContext("./models/sphere.obj", sphereContext);
-		loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 
 		sunTexture = Core::LoadTexture("textures/planets/8k_sun.jpg");
 

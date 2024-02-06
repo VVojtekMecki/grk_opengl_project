@@ -66,7 +66,7 @@ public:
 
 		Core::SetActiveTexture(texture, "ship", program, 0);
 		Core::SetActiveTexture(rust, "rust", program, 1);
-		Core::SetActiveTexture(shipScratches, "scratches", program, 2);
+		Core::SetActiveTexture(shipScratches, "asteroid", program, 2);
 		Core::SetActiveTexture(normals, "normalSampler", program, 3);
 
 		Core::DrawContext(context);

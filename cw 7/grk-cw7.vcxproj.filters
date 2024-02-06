@@ -63,7 +63,7 @@
     <ClCompile Include="src\objects\space_objects.h">
       <Filter>Header Files\objects</Filter>
     </ClCompile>
-    <ClCompile Include="src\space_objects.cpp">
+    <ClCompile Include="src\objects\asteroids_list.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -109,9 +109,6 @@
     </ClInclude>
     <ClInclude Include="src\objects\skybox.h">
       <Filter>Header Files\objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ex_7_1.hpp">
-      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

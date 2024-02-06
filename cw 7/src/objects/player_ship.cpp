@@ -35,7 +35,7 @@ public:
 
 		loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 
-		shipTexture = Core::LoadTexture("textures/spaceship/spaceship.jpg");
+		shipTexture = Core::LoadTexture("textures/spaceship/SF_Fighter-Albedo.jpg");
 		shipNormalTexture = Core::LoadTexture("textures/spaceship/SF_Fighter_Normal.jpg");
 		this->ship = new Ship("player_ship", programPBR, shipContext, shipTexture, shipNormalTexture);
 		this->ship->init();
