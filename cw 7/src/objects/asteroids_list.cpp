@@ -10,7 +10,7 @@
 class AsteroidsList {
 
 private:
-	int amountAsteroids = 200;
+	int amountAsteroids = 400;
 	int positionX, positionY, positionZ = 0;
 	
 	GLuint asteroidGreyTexture;
