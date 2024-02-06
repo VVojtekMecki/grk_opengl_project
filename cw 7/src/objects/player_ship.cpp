@@ -5,9 +5,12 @@ private:
 	GLuint shipTexture;
 	GLuint shipNormalTexture;
 	GLuint programShip;
+	GLuint programPBR;
+
 
 	Core::Shader_Loader shaderLoader;
 	Core::RenderContext shipContext;
+
 
 	void loadModelToContext(std::string path, Core::RenderContext& context)
 	{
@@ -28,12 +31,13 @@ public:
 
 	void init() {
 		programShip = shaderLoader.CreateProgram("shaders/shader_ship.vert", "shaders/shader_ship.frag");
+		programPBR = shaderLoader.CreateProgram("shaders/PBR.vert", "shaders/PBR.frag");
 
 		loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 
 		shipTexture = Core::LoadTexture("textures/spaceship/spaceship.jpg");
 		shipNormalTexture = Core::LoadTexture("textures/spaceship/SF_Fighter_Normal.jpg");
-		this->ship = new Ship("player_ship", programShip, shipContext, shipTexture, shipNormalTexture);
+		this->ship = new Ship("player_ship", programPBR, shipContext, shipTexture, shipNormalTexture);
 		this->ship->init();
 	};
 };

@@ -63,6 +63,9 @@
     <ClCompile Include="src\objects\space_objects.h">
       <Filter>Header Files\objects</Filter>
     </ClCompile>
+    <ClCompile Include="src\space_objects.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\objload.h">
@@ -107,6 +110,9 @@
     <ClInclude Include="src\objects\skybox.h">
       <Filter>Header Files\objects</Filter>
     </ClInclude>
+    <ClInclude Include="src\ex_7_1.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader_5_sun.frag">
@@ -149,6 +155,24 @@
       <Filter>Shader Files</Filter>
     </None>
     <None Include="shaders\shader_skybox.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_pbr.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_pbr.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PBR.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PBR.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PBRforEarth.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PBRforEarth.frag">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

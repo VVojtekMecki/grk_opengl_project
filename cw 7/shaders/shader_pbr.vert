@@ -11,6 +11,7 @@ uniform mat4 modelMatrix;
 
 out vec3 vecNormal;
 out vec3 worldPos;
+
 out vec2 vtc;
 
 uniform vec3 lightPos;
@@ -20,13 +21,12 @@ uniform vec3 sunDir;
 out vec3 viewDirTS;
 out vec3 lightDirTS;
 out vec3 sunDirTS;
-out vec2 fragTexCoord;  
-
 
 void main()
 {
 	worldPos = (modelMatrix * vec4(vertexPosition, 1)).xyz;
 	vecNormal = (modelMatrix * vec4(vertexNormal, 0)).xyz;
+
 	gl_Position = transformation * vec4(vertexPosition, 1.0);
 	
 	vtc = vec2(vertexTexCoord.x, 1.0 - vertexTexCoord.y);
@@ -34,7 +34,7 @@ void main()
 	vec3 w_tangent = normalize(mat3(modelMatrix) * vertexTangent);
 	vec3 w_bitangent = normalize(mat3(modelMatrix) * vertexBitangent);
 	mat3 TBN = transpose(mat3(w_tangent, w_bitangent, vecNormal));
-	fragTexCoord = vec2(vertexTexCoord.x, vertexTexCoord.y);
+	
 	vec3 V = normalize(cameraPos - worldPos);
 	viewDirTS = TBN * V;
 	vec3 L = normalize(lightPos - worldPos);

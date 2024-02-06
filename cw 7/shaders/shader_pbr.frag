@@ -1,29 +1,34 @@
 #version 430 core
 
-float AMBIENT = 0.25f;
-float PI = 3.14159f;
+float AMBIENT = 0.05;
+float PI = 3.14159;
 
-uniform sampler2D depthMap;
+uniform sampler2D colorTexture;
+
+uniform float exposition;
+uniform float metallic;
+uniform float roughness;
 
 uniform vec3 cameraPos;
 
-uniform sampler2D colorTexture;
-uniform sampler2D normalSampler; 
 uniform vec3 sunDir;
 uniform vec3 sunColor;
 
 uniform vec3 lightPos;
 uniform vec3 lightColor;
 
-uniform float metallic;
-uniform float roughness;
+uniform bool atmosphereCheck;
 
-uniform float exposition;
+uniform float u_time;
+uniform float cloudLight;
+uniform float cloudIntensity; 
+uniform float cloudSpeed; 
+uniform float cloudLightness; 
 
 in vec3 vecNormal;
 in vec3 worldPos;
 in vec2 vtc;
-in vec2 fragTexCoord;
+
 out vec4 outColor;
 
 in vec3 viewDirTS;
@@ -99,30 +104,91 @@ vec3 PBRLight(vec3 lightDir, vec3 radiance, vec3 normal, vec3 V, vec3 color)
 
 vec3 toneMapping(vec3 color)
 {
-	float exposure = 0.03;
+	float exposure = 0.06;
 	vec3 mapped = 1 - exp(-color * exposure);
 	return mapped;
 }
 
-void main()
-{
-    //vec3 normal = normalize(vecNormal);
-    vec4 N = texture(normalSampler, fragTexCoord);
-    vec3 normal = normalize((N*2.0-1.0).xyz);
+float random (in vec2 st) {
+    return fract(sin(dot(st.xy,
+                         vec2(12.9898,78.233)))*
+        43758.5453123);
+}
 
-    vec3 viewDir = normalize(viewDirTS);
-    //vec3 viewDir = normalize(cameraPos - worldPos);
+float noise (in vec2 st) {
+    vec2 i = floor(st);
+    vec2 f = fract(st);
 
-	vec3 lightDir = normalize(lightDirTS);
-    //vec3 lightDir = normalize(lightPos - worldPos);
+    // Four corners in 2D of a tile
+    float a = random(i);
+    float b = random(i + vec2(1.0, 0.0));
+    float c = random(i + vec2(0.0, 1.0));
+    float d = random(i + vec2(1.0, 1.0));
+
+    vec2 u = f * f * (3.0 - 2.0 * f);
+
+    return mix(a, b, u.x) +
+            (c - a)* u.y * (1.0 - u.x) +
+            (d - b) * u.x * u.y;
+}
+
+#define OCTAVES 6
+float fbm (in vec2 st) {
+    // Initial values
+    float value = 0.0;
+    float amplitude = .5;
+    float frequency = 0.;
+    //
+    // Loop of octaves
+    for (int i = 0; i < OCTAVES; i++) {
+        value += amplitude * noise(st);
+        st *= 2.;
+        amplitude *= .5;
+    }
+    return value;
+}
+
+vec4 noiseColor() {
+    vec2 st = vtc.xy;
+    vec2 mirroredSt = vec2(1.0 - st.x, st.y);
+    
+    float timeOffset = u_time * cloudSpeed;
+    st.x -= timeOffset;
+    mirroredSt.x += timeOffset; // Inverse direction for mirrored effect
+
+    st.x = fract(st.x);
+    mirroredSt.x = fract(mirroredSt.x);
+
+    vec3 color = vec3(fbm(st * cloudIntensity));
+    vec3 mirroredColor = vec3(fbm(mirroredSt * cloudIntensity));
+
+    float blend = smoothstep(0.45, 0.55, st.x); 
+
+    vec3 finalColor = mix(color, mirroredColor, blend);
+
+    vec4 noiseColor = vec4(finalColor, 1.0);
+
+    return noiseColor;
+}
+
+void main() {
+    vec3 normal = normalize(vecNormal);
+    vec3 viewDir = normalize(cameraPos - worldPos);
+	vec3 lightDir = normalize(lightPos - worldPos);
 
     vec4 textureColor = texture2D(colorTexture, vtc);
 
+    float atmosphereDot = dot(normal, viewDir);
+    vec3 atmosphereColor = vec3(0.04, 0.2, 1.0);
+
+    if (atmosphereCheck)
+        textureColor = mix(textureColor, vec4(atmosphereColor / atmosphereDot, 1.0), 0.1);
+
     float diffuse = max(0, dot(normal, lightDir));
-    vec3 distance = lightColor / pow(length(lightPos - worldPos), 2.0) * 300;
-    vec3 toneMappedColor = toneMapping(vec3(textureColor) * min(1, AMBIENT + diffuse) * distance);
+    vec3 distance = lightColor / pow(length(lightPos - worldPos), 2.0) * 10;
+    vec3 toneMappedColor = toneMapping(vec3(textureColor) * distance);
     //gamma correction
-    //toneMappedColor = pow(toneMappedColor, vec3(1.0/2.2)); 
+    toneMappedColor = pow(toneMappedColor, vec3(1.0/2.2));
 
 	vec3 ambient = AMBIENT * toneMappedColor;
 	vec3 attenuatedLightColor = lightColor / pow(length(lightPos - worldPos), 2);
@@ -132,5 +198,11 @@ void main()
 	//sun
 	illumination = illumination + PBRLight(sunDir, sunColor, normal, viewDir, toneMappedColor);
 
-	outColor = vec4(vec3(1.0) - exp(-illumination * exposition), 1);
+    vec3 pbrColor = vec3(1.0) - exp(-illumination * exposition);
+
+    vec4 noiseColor = noiseColor() * min(1, AMBIENT + cloudLightness * diffuse) * vec4(lightColor, 0.0) / cloudLight;
+
+    vec3 mixedColor = mix(pbrColor.rgb, noiseColor.rgb, noiseColor.r);
+
+    outColor = vec4(mixedColor, 1.0);
 }

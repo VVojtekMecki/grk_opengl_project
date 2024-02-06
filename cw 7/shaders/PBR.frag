@@ -131,7 +131,7 @@ void main()
     vec3 viewDir = normalize(viewDirTS);
     //vec3 viewDir = normalize(cameraPos-worldPos);
 
-	vec3 lightDir = normalize(lightDirTS);
+	vec3 lightDir = normalize(-lightDirTS);
     //vec3 lightDir = normalize(lightPos-worldPos);
 
     //COMMENT TO USE 2 TEXTURES
@@ -139,23 +139,6 @@ void main()
     float diffuse = max(0, dot(normal, lightDir));
     vec3 color = ((finalColor * min(1, AMBIENT + diffuse))*3).rgb;
 
-
-    //finalColor = mix(finalColor, asteroidColor.rgb, 0.3);
-    //vec3 finalColor = mix(vec3(1.0), texture.rgb, rustColor.r) + asteroidColor.rgb * 0.2;
-	//vec3 normal = vec3(0,0,1);
-    //vec3 normal = normalize(vecNormal);
-
-
-
-    
-
-
-
-
-    //vec4 textureColor = texture2D(texture1, vtc);
-    //float diffuse = max(0, dot(normal, lightDir));
-    //vec3 distance = lightColor / pow(length(lightPos - worldPos), 2.0) * 300;
-    //vec3 color = toneMapping(vec3(textureColor)* min(1, AMBIENT + diffuse) * distance);
 
 	vec3 ambient = AMBIENT*color;
 	vec3 attenuatedlightColor = lightColor/pow(length(lightPos-worldPos),2);

@@ -28,8 +28,8 @@ glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
 
 
-glm::vec3 spotlightPos = glm::vec3(0, 0, 0);
-glm::vec3 spotlightConeDir = glm::vec3(0, 0, 0);
+glm::vec3 spotlightPos = glm::vec3(1.4, 1.4, 1.4);
+glm::vec3 spotlightConeDir = glm::vec3(1.4, 1.4, 1.4);
 
 glm::vec3 spaceshipPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 spaceshipDir = glm::vec3(1.f, 0.f, 0.f);
@@ -39,9 +39,9 @@ float aspectRatio = 1.f;
 
 float lastFrameTime = 0.0f;
 float deltaTime = 0.0f;
-float planetRough = 0.5f;
-float planetMetal = 1.5f;
-float lightPower = 10.f;
+float planetRough = 0.3f;
+float planetMetal = 0.3f;
+float lightPower = 25.f;
 glm::vec3 lightColor = glm::vec3(lightPower, lightPower, lightPower);
 
 
@@ -111,23 +111,32 @@ void renderScene(GLFWwindow* window)
 
 	std::map<std::string, glm::mat4> modelMatrixMap = {
 		{ "sun", glm::mat4() * glm::scale(glm::vec3(4.f)) },
-		{ "earth", glm::eulerAngleY(time / 30) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
+		{ "earth", glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
 		{ "moon", glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(time) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)) },
-		{ "mars", glm::eulerAngleY((time + 6) / 30) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f))},
+		{ "mars", glm::eulerAngleY((time + 6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f))},
 		{ "aliensPlanet", glm::eulerAngleY(time / 3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f))},
 		{ "venus", glm::eulerAngleY(time / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
 		{ "humea", glm::eulerAngleY(time / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f))},
 		{ "mercury", glm::eulerAngleY(time / 7) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f))},
 	};
-	std::map<std::string, glm::mat4> startPlanetPosition = {
-		{ "sun", glm::mat4()},
-		{ "earth",glm::eulerAngleY(time / 30)},
-		{ "moon",  glm::eulerAngleY(time / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(time)},
-		{ "mars", glm::eulerAngleY((time + 6) / 30)},
-		{ "aliensPlanet", glm::eulerAngleY(time / 3.3f)},
-		{ "venus", glm::eulerAngleY(time / 4)},
-		{ "humea", glm::eulerAngleY(time / 5)},
-		{ "mercury", glm::eulerAngleY(time / 7)},
+
+	std::map<std::string, glm::vec3> startPlanetPosition = {
+		//{ "sun", glm::mat4()},
+		//{ "earth",glm::eulerAngleY(time / 3)},
+		//{ "moon",  glm::eulerAngleY(time / 3)},
+		//{ "mars", glm::eulerAngleY((time + 6) / 3)},
+		//{ "aliensPlanet", glm::eulerAngleY(time / 3.3f)},
+		//{ "venus", glm::eulerAngleY(time / 4)},
+		//{ "humea", glm::eulerAngleY(time / 5)},
+		//{ "mercury", glm::eulerAngleY(time / 7)},
+		{ "sun", glm::vec3()},
+		{ "earth",glm::vec3(10.f, 0, 0)},
+		{ "moon",  glm::vec3(10.f, 0, 0)},
+		{ "mars", glm::vec3(15.f, 0, 0)},
+		{ "aliensPlanet", glm::vec3(20.f, 0, 0)},
+		{ "venus", glm::vec3(25.f, 0, 0)},
+		{ "humea", glm::vec3(30.f, 0, 0)},
+		{ "mercury",glm::vec3(35.f, 0, 0)},
 	};
 	glm::mat4 projectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 
@@ -136,7 +145,7 @@ void renderScene(GLFWwindow* window)
 	//}
 	// 
 	for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
-		obj.object->drawObjectPBR(projectionMatrix, modelMatrixMap.at(obj.name), planetRough, planetMetal, lightColor, lightPower, cameraPos, 
+		obj.object->drawWithPBR(projectionMatrix, modelMatrixMap.at(obj.name), planetRough, planetMetal, lightColor, lightPower, cameraPos, 
 			startPlanetPosition.at(obj.name), spotlightPos, spotlightConeDir);
 	}
 
@@ -156,7 +165,9 @@ void renderScene(GLFWwindow* window)
 
 	glm::mat4 shipModelMatrix = glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f));
 
-	player.ship->drawObjectTexture(projectionMatrix, shipModelMatrix);
+	//player.ship->drawObjectTexture(projectionMatrix, shipModelMatrix);
+	player.ship->drawWithPBR(projectionMatrix, shipModelMatrix, planetRough, planetMetal, lightColor, lightPower, cameraPos, glm::vec3(),
+		spotlightPos, spotlightConeDir);
 	spotlightPos = spaceshipPos + 0.2 * spaceshipDir;
 	spotlightConeDir = spaceshipDir;
 	glfwSwapBuffers(window);
