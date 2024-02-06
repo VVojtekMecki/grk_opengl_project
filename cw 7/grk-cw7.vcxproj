@@ -28,7 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
-    <ClInclude Include="src\ex_7_1.hpp" />
     <ClInclude Include="src\objects\ship.h" />
     <ClInclude Include="src\objects\skybox.h" />
     <ClInclude Include="src\scene.hpp" />

@@ -131,7 +131,7 @@ void main()
 
 
 	vec3 ambient = AMBIENT*color;
-	vec3 attenuatedlightColor = lightColor/pow(length(lightPos-worldPos),2);
+	vec3 attenuatedlightColor = lightColor/pow(length(lightPos-worldPos),2)*30;
 	vec3 ilumination;
 	ilumination = ambient+PBRLight(lightDir,attenuatedlightColor,normal,viewDir,color);
 	
