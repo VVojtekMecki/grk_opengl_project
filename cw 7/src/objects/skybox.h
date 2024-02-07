@@ -40,12 +40,18 @@ public:
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 		int w, h;
 		std::vector<std::string> filepaths = {
-		  "./textures/skybox/lightblue/right.png",
+		 /* "./textures/skybox/lightblue/right.png",
 		  "./textures/skybox/lightblue/left.png",
 		  "./textures/skybox/lightblue/top.png",
 		  "./textures/skybox/lightblue/bot.png",
 		  "./textures/skybox/lightblue/front.png",
-		  "./textures/skybox/lightblue/back.png",
+		  "./textures/skybox/lightblue/back.png",*/
+			"./textures/skybox/red/bkg1_right1.png",
+			"./textures/skybox/red/bkg1_left2.png",
+			"./textures/skybox/red/bkg1_top3.png",
+			"./textures/skybox/red/bkg1_bottom4.png",
+			"./textures/skybox/red/bkg1_front5.png",
+			"./textures/skybox/red/bkg1_back6.png",
 		};
 		for (unsigned int i = 0; i < 6; i++)
 		{

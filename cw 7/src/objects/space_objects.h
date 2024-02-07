@@ -22,6 +22,51 @@ class SpaceObject {
 
 #endif
 
+
+#ifndef DETAILS_h
+#define DETAILS_h
+
+class Details : public SpaceObject {
+public:
+	std::string name;
+	GLuint texture;
+	GLuint normals;
+	GLuint program;
+	Core::RenderContext& context;
+	glm::mat4 modelMatrix;
+
+
+
+	Details(std::string name, GLuint program, Core::RenderContext& context, GLuint texture, GLuint normals) :program(program), context(context), texture(texture), normals(normals), name(name) {}
+
+	void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const override {
+
+		glUseProgram(program);
+		glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+		glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
+		glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+
+		Core::SetActiveTexture(texture, "texture", program, 0);
+		Core::SetActiveTexture(normals, "normalSampler", program, 1);
+
+		Core::DrawContext(context);
+		glUseProgram(0);
+	}
+	GLuint getTexture() const override { return this->texture; };
+	GLuint getNormals() const override { return this->normals; };
+	GLuint getProgram() const override { return this->program; };
+	Core::RenderContext& getContext() const override { return this->context; };
+	glm::mat4 getModelMatrix() const override { return this->modelMatrix; };
+	std::string getName() const override { return this->name; };
+
+
+
+};
+#endif // !DETAILS_h
+
+
+
+
 #ifndef PLANET_H
 #define PLANET_H
 

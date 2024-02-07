@@ -20,17 +20,67 @@
 #include "objects/player_ship.cpp"
 #include "objects/skybox.h"
 #include "objects/asteroids_list.cpp"
+#include "objects/details_list.cpp"
+#include "objects/shipToRepairHeader.h"
+
 
 GLuint program;
+GLuint programTex;
+
 
 Core::Shader_Loader shaderLoader;
 
 glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
-glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
+glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 1.f);
+
+glm::mat4 shipModelMatrix;
 
 glm::vec3 spaceshipPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 spaceshipDir = glm::vec3(1.f, 0.f, 0.f);
 GLuint VAO,VBO;
+
+namespace detailsTextures {
+	GLuint engineDetailTexture;
+	GLuint engineDetailNormal;
+	GLuint firstAidKit;
+	GLuint firstAidKitNormal;
+	GLuint crewMember;
+	GLuint crewMemberNormal;
+
+};
+Core::RenderContext spaceshipEngineDetailContext;
+Core::RenderContext firstAidBoxContext;
+Core::RenderContext crewMemberContext;
+
+bool isPKeyPressed = false;
+bool isRKeyPressed = false;
+
+bool canPickUpEngine = false;
+bool canPickUpKit = false;
+
+bool canPickUpCrew = false;
+
+bool drawSpaceshipEngine = true;
+bool drawSpaceshipKit = true;
+bool drawSpaceshipCrew = true;
+
+bool isDragging = false;
+
+bool isEnginePickedUp = false;
+bool isKitPickedUp = false;
+bool isCrewPickedUp = false;
+
+bool isEngineCloseToShipRepair = false;
+bool isKitCloseToShipRepair = false;
+bool isCrewCloseToShipRepair = false;
+
+
+glm::mat4 engineDetailMatrix;
+glm::mat4 kitMatrix;
+glm::mat4 crewMemberMatrix;
+
+std::map<std::string, glm::mat4> detailsMatrixMap;
+
 
 float aspectRatio = 1.f;
 
@@ -76,14 +126,37 @@ glm::mat4 createPerspectiveMatrix()
 
 SpaceObjectsList spaceObjectsList(glfwGetTime(), createPerspectiveMatrix()* createCameraMatrix());
 
+DetailsList detailslist(glfwGetTime(), createPerspectiveMatrix()* createCameraMatrix());
+
+ShipToRepair shipToRepair;
+//Details drawDetail;
 AsteroidsList asteroidsList;
 
 PlayerShip player;
 
 Skybox skybox;
 
+
+void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
+	glUseProgram(program);
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+
+		Core::SetActiveTexture(textureID, "tex", program, 0);
+		Core::SetActiveTexture(normalmapId, "normalSampler", program, 1);
+	
+
+	Core::DrawContext(context);
+	glUseProgram(0);
+}
+
+
+
 void renderScene(GLFWwindow* window)
 {
+    	
 
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -136,9 +209,158 @@ void renderScene(GLFWwindow* window)
 		0.,0.,0.,1.,
 		});
 
-	glm::mat4 shipModelMatrix = glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f));
+	shipModelMatrix = glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f));
 
 	player.ship->drawObjectTexture(projectionMatrix, shipModelMatrix);
+
+
+	std::map<std::string, glm::mat4> shipRepairMatrixMap = {
+	  {"shipToRepair",glm::translate(glm::vec3(27.5f, 4, 0)) * glm::scale(glm::vec3(0.15f))}
+	};
+
+	shipToRepair.repair->drawObjectTexture(projectionMatrix, shipRepairMatrixMap.at("shipToRepair"));
+
+
+	//together for every detail
+
+	glm::vec3 shipRepairTranslationVec = glm::vec3(shipRepairMatrixMap.at("shipToRepair")[3]);
+	glm::vec3 shipTranslationVec = glm::vec3(shipModelMatrix[3]);
+
+
+	engineDetailMatrix = glm::eulerAngleX(timeGl / 10) * glm::eulerAngleY(timeGl / 10) * glm::translate(glm::vec3(17.5f, 0, 0));
+
+	//engine detail drag
+	glm::vec3 engineDetailTranslationVec = glm::vec3(engineDetailMatrix[3]);
+
+	glm::vec3 spaceshipPosCOPY = spaceshipPos;
+	spaceshipPosCOPY.y -= 0.3;
+	if (glm::distance(shipTranslationVec, engineDetailTranslationVec) < 1.0f && !isDragging)
+	{
+		canPickUpEngine = true;
+	}
+	if (isPKeyPressed && canPickUpEngine) {
+		isEnginePickedUp = true;
+		isDragging = true;
+
+		engineDetailMatrix = glm::translate(spaceshipPosCOPY);
+
+		
+		float dist = glm::distance(shipTranslationVec, shipRepairTranslationVec);
+
+		if (glm::distance(shipTranslationVec, shipRepairTranslationVec) < 3.f) {
+			isEngineCloseToShipRepair = true;
+		}
+		else {
+			isEngineCloseToShipRepair = false;
+		}
+		//isObjectPickedUp - about engine
+		if (isRKeyPressed && isEnginePickedUp && isEngineCloseToShipRepair) {
+			drawSpaceshipEngine = false;
+
+			isPKeyPressed = false;
+			isRKeyPressed = false;
+
+			canPickUpEngine = false;
+			isEnginePickedUp = false;
+
+			isDragging = false;
+			shipToRepair.repair->amountOfPickedUpObjects += 1;
+
+
+		}
+	}
+	if (drawSpaceshipEngine) {
+		drawObjectTexture(programTex, spaceshipEngineDetailContext, engineDetailMatrix * glm::scale(glm::vec3(0.15f)), detailsTextures::engineDetailTexture, detailsTextures::engineDetailNormal);
+		//player.ship->amountOfPickedUpObjects += 1;
+	}
+
+	spaceshipPosCOPY = spaceshipPos;
+	spaceshipPosCOPY.y -= 0.3;
+
+	//start kit
+	kitMatrix = glm::eulerAngleX(timeGl / 12.f) * glm::translate(glm::vec3(12.7f, 5.f, 0)) * glm::eulerAngleY(timeGl / 12.f);
+	glm::vec3 kitDetailTranslationVec = glm::vec3(kitMatrix[3]);
+	if (glm::distance(shipTranslationVec, kitDetailTranslationVec) < 1.0f && !isDragging)
+	{
+		canPickUpKit = true;
+	}
+	if (isPKeyPressed && canPickUpKit) {
+		isKitPickedUp = true;
+		isDragging = true;
+
+		
+
+		kitMatrix = glm::translate(spaceshipPosCOPY);
+		if (glm::distance(shipTranslationVec, shipRepairTranslationVec) < 3.f) {
+			isKitCloseToShipRepair = true;
+		}
+		else {
+			isKitCloseToShipRepair = false;
+		}
+		if (isRKeyPressed) {
+			drawSpaceshipKit = false;
+			isPKeyPressed = false;
+			isRKeyPressed = false;
+
+			canPickUpKit = false;
+			isKitPickedUp = false;
+			isDragging = false;
+			shipToRepair.repair->amountOfPickedUpObjects += 1;
+
+
+		}
+	}
+	if (drawSpaceshipKit) {
+		drawObjectTexture(programTex, firstAidBoxContext, kitMatrix * glm::scale(glm::vec3(0.06f)), detailsTextures::firstAidKit, detailsTextures::firstAidKitNormal);
+	}
+
+
+
+	spaceshipPosCOPY = spaceshipPos;
+	spaceshipPosCOPY.y -= 0.6;
+	//crew member
+	crewMemberMatrix = glm::eulerAngleX(timeGl / 15) * glm::translate(glm::vec3(3.5f, -7.f, 0)) * glm::eulerAngleY(timeGl / 15);
+	glm::vec3 crewDetailTranslationVec = glm::vec3(crewMemberMatrix[3]);
+	if (glm::distance(shipTranslationVec, crewDetailTranslationVec) < 1.0f && !isDragging)
+	{
+		canPickUpCrew = true;
+
+	}
+	if (isPKeyPressed && canPickUpCrew) {
+		isCrewPickedUp = true;
+		isDragging = true;
+		crewMemberMatrix = glm::translate(spaceshipPosCOPY);
+		if (glm::distance(shipTranslationVec, shipRepairTranslationVec) < 3.f && !isEnginePickedUp && !isKitPickedUp) {
+			isCrewCloseToShipRepair = true;
+		}
+		else {
+			isCrewCloseToShipRepair = false;
+		}
+		if (isRKeyPressed) {
+			drawSpaceshipCrew = false;
+			isPKeyPressed = false;
+			isRKeyPressed = false;
+
+			canPickUpCrew = false;
+			isCrewPickedUp = false;
+			isDragging = false;
+			shipToRepair.repair->amountOfPickedUpObjects += 1;
+		}
+	}
+	if (drawSpaceshipCrew) {
+		drawObjectTexture(programTex, crewMemberContext, crewMemberMatrix * glm::scale(glm::vec3(0.05f)), detailsTextures::crewMember, detailsTextures::crewMemberNormal);
+		
+
+	}
+
+
+	if (shipToRepair.repair->amountOfPickedUpObjects == 3) {
+		shipToRepair.repair->indexNormal = 1;
+
+	}
+
+
+
 
 	glfwSwapBuffers(window);
 }
@@ -164,6 +386,8 @@ void loadModelToContext(std::string path, Core::RenderContext& context)
 
 void init(GLFWwindow* window)
 {
+	
+
 	skybox.init();
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -171,13 +395,36 @@ void init(GLFWwindow* window)
 	glEnable(GL_DEPTH_TEST);
 	program = shaderLoader.CreateProgram("shaders/shader_5_1.vert", "shaders/shader_5_1.frag");
 
+
+	programTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex_copy.vert", "shaders/shader_5_1_tex_copy.frag");
+
+	detailsTextures::engineDetailTexture = Core::LoadTexture("textures/details/airplane_engine_BaseColor.png");
+	detailsTextures::engineDetailNormal = Core::LoadTexture("textures/details/airplane_engine_Normal.png");
+
+	detailsTextures::firstAidKit = Core::LoadTexture("textures/details/first_aid_box_base.png");
+	detailsTextures::firstAidKitNormal = Core::LoadTexture("textures/details/first_aid_box_base_normal.png");
+
+	detailsTextures::crewMember = Core::LoadTexture("textures/details/Alien_BaseColor.png");
+	detailsTextures::crewMemberNormal = Core::LoadTexture("textures/details/Alien_Normal.png");
+
+	loadModelToContext("./models/airplane-engine-detail.obj", spaceshipEngineDetailContext);
+	loadModelToContext("./models/Firstaidbox.obj", firstAidBoxContext);
+	loadModelToContext("./models/crew_member.obj", crewMemberContext);
+
 	spaceObjectsList.init();
 	asteroidsList.init();
 	player.init();
+	shipToRepair.init();
+	//detailslist.init();
 }
 
 void shutdown(GLFWwindow* window)
 {
+
+
+
+
+
 	shaderLoader.DeleteProgram(program);
 }
 
@@ -206,6 +453,29 @@ void processInput(GLFWwindow* window)
 		spaceshipDir = glm::vec3(glm::eulerAngleY(angleSpeed) * glm::vec4(spaceshipDir, 0));
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		spaceshipDir = glm::vec3(glm::eulerAngleY(-angleSpeed) * glm::vec4(spaceshipDir, 0));
+
+
+	if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS))
+	{
+		spaceshipPos += spaceshipDir * moveSpeed * 5;
+	}
+
+
+	if ((glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) && (canPickUpEngine || canPickUpKit || canPickUpCrew))
+	{
+		isPKeyPressed = true;
+		//std::cout << "iside input: P    canPickUpEngine " << canPickUpEngine << "	canPickUpKit " << canPickUpKit<< "	canPickUpCrew " << canPickUpCrew << std::endl;
+	}
+
+	if ((glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) && (isKitPickedUp || isEnginePickedUp || isCrewPickedUp) && (isKitCloseToShipRepair || isEngineCloseToShipRepair || isCrewCloseToShipRepair))
+	{
+		isRKeyPressed = true;
+		//std::cout << "iside input: R   " << isRKeyPressed << std::endl;
+
+	}
+
+
+
 
 	cameraPos = spaceshipPos - 1.5 * spaceshipDir + glm::vec3(0, 1, 0) * 0.5f;
 	cameraDir = spaceshipDir;

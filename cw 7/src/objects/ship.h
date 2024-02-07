@@ -16,14 +16,23 @@ public:
 	Core::RenderContext& context;
 	glm::mat4 modelMatrix;
 
+
+
+
 public:
 	Ship(std::string name, GLuint program, Core::RenderContext& context, GLuint texture, GLuint normals)
 		: program(program), context(context), texture(texture), normals(normals), name(name) {}
+
+
+
 
 	void init() {
 		rust = Core::LoadTexture("textures/spaceship/rust.png");
 		shipScratches = Core::LoadTexture("textures/spaceship/scratches.png");
 	}
+
+	
+
 
 	void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const override {
 		glUseProgram(program);
