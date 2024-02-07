@@ -111,5 +111,5 @@ void main()
 
 	vec4 texColor = vec4(toneMappedColor * lightColor * 0.22f, 1.0);
 
-    outColor = mix(texColor, noiseColor, 0.7);
+    outColor = mix(texColor, noiseColor, 0.8);
 }

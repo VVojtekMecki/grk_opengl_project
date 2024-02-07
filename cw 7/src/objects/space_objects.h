@@ -12,8 +12,6 @@ class SpaceObject {
 		virtual ~SpaceObject() = default;
 		virtual void drawWithPBR(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix, float roughness, float metallic, glm::vec3 lightColor,
 			float loghtPower, glm::vec3 cameraPos, glm::vec3 startPlanetPos, glm::vec3 spotlightPos, glm::vec3 spotlightConeDir) const = 0;
-		//virtual void drawObjectPBR(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix, float roughness, float metallic, glm::vec3 lightColor,
-		//float loghtPower, glm::vec3 cameraPos, glm::vec3 startPlanetPos, glm::vec3 spotlightPos, glm::vec3 spotlightConeDir) const = 0;
 		virtual void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const = 0;
 		virtual std::string getName() const = 0;
 		virtual GLuint getTexture() const = 0;
@@ -25,6 +23,45 @@ class SpaceObject {
 };
 
 #endif
+
+
+#ifndef DETAILS_h
+#define DETAILS_h
+
+class Details {
+public:
+	std::string name;
+	GLuint texture;
+	GLuint normals;
+	GLuint program;
+	Core::RenderContext& context;
+	glm::mat4 modelMatrix;
+
+
+
+	Details(std::string name, GLuint program, Core::RenderContext& context, GLuint texture, GLuint normals) :program(program), context(context), texture(texture), normals(normals), name(name) {}
+
+	void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) {
+
+		glUseProgram(program);
+		glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+		glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
+		glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+
+		Core::SetActiveTexture(texture, "texture", program, 0);
+		Core::SetActiveTexture(normals, "normalSampler", program, 1);
+
+		Core::DrawContext(context);
+		glUseProgram(0);
+	}
+
+
+
+};
+#endif
+
+
+
 
 #ifndef PLANET_H
 #define PLANET_H

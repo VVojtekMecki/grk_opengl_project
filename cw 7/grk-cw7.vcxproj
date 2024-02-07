@@ -44,26 +44,16 @@
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\PBR.frag" />
-    <None Include="shaders\PBR.vert" />
+    <None Include="shaders\PBRforShip.frag" />
+    <None Include="shaders\PBRforShip.vert" />
     <None Include="shaders\PBRforEarth.frag" />
     <None Include="shaders\PBRforEarth.vert" />
     <None Include="shaders\clouds_noise.frag" />
     <None Include="shaders\clouds_noise.vert" />
-    <None Include="shaders\shader_5_1.frag" />
-    <None Include="shaders\shader_5_1.vert" />
-    <None Include="shaders\shader_5_1_tex.frag" />
-    <None Include="shaders\shader_5_1_tex.vert" />
-    <None Include="shaders\shader_5_1_tex_copy.frag" />
-    <None Include="shaders\shader_5_1_tex_copy.vert" />
-    <None Include="shaders\shader_5_sun.frag" />
-    <None Include="shaders\shader_5_sun.vert" />
-    <None Include="shaders\shader_earth.frag" />
-    <None Include="shaders\shader_earth.vert" />
-    <None Include="shaders\shader_pbr.frag" />
-    <None Include="shaders\shader_pbr.vert" />
-    <None Include="shaders\shader_ship.frag" />
-    <None Include="shaders\shader_ship.vert" />
+    <None Include="shaders\shader_scene_program.frag" />
+    <None Include="shaders\shader_scene_program.vert" />
+    <None Include="shaders\texturesPlusNormals.frag" />
+    <None Include="shaders\texturesPlusNormals.vert" />
     <None Include="shaders\shader_skybox.frag" />
     <None Include="shaders\shader_skybox.vert" />
     <None Include="shaders\shader_sun.frag" />

@@ -63,18 +63,18 @@ public:
 
 		srand(static_cast<unsigned>(time(0)));
 		for (int asteroid = 0; asteroid < amountAsteroids; asteroid++) {
-			positionX = getRandomNumber(-65, 65);
-			positionY = getRandomNumber(-35, 35);
-			positionZ = getRandomNumber(-35, 35);
+			positionX = getRandomNumber(-100, 100);
+			positionY = getRandomNumber(-60, 60);
+			positionZ = getRandomNumber(-60, 60);
 
 			bool truePositionZ = false;
-			if (positionY > -16 && positionY < 16) {
+			if (positionY > -25 && positionY < 25) {
 				while (truePositionZ != true) {
-					if (positionZ < -8 || positionZ > 8) {
+					if (positionZ < -15 || positionZ > 15) {
 						truePositionZ = true;
 						break;
 					}
-					positionZ = getRandomNumber(-35, 35);
+					positionZ = getRandomNumber(-60, 60);
 				}
 			}
 

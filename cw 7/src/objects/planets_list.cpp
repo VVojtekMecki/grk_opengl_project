@@ -48,10 +48,7 @@ private:
 	GLuint moonNormalTexture;
 
 
-	GLuint programTex;
-	GLuint programEarth;
 	GLuint programPBREarth;
-	GLuint programNewPBR;
 	GLuint programCloudsAnimation;
 
 	Core::Shader_Loader shaderLoader;
@@ -79,12 +76,8 @@ public:
 	SpaceObjectsList(float time, glm::mat4 viewProjectionMatrix) : time(time), viewProjectionMatrix(viewProjectionMatrix) {}
 
 	void init() {
-		programTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex_copy.vert", "shaders/shader_5_1_tex_copy.frag");
-		programEarth = shaderLoader.CreateProgram("shaders/shader_earth.vert", "shaders/shader_earth.frag");
 		programPBREarth = shaderLoader.CreateProgram("shaders/PBRforEarth.vert", "shaders/PBRforEarth.frag");
-		programNewPBR = shaderLoader.CreateProgram("shaders/PBR.vert", "shaders/PBR.frag");
 		programCloudsAnimation = shaderLoader.CreateProgram("shaders/clouds_noise.vert", "shaders/clouds_noise.frag");
-
 
 
 		loadModelToContext("./models/sphere.obj", sphereContext);
@@ -129,8 +122,8 @@ public:
 		CloudedPlanet* mars = new CloudedPlanet("mars", programPBREarth, sphereContext, SpaceObjectsList::marsTexture, SpaceObjectsList::marsNormalTexture, SpaceObjectsList::marsTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("mars", mars));
 
-		//CloudedPlanet* aliensPlanet = new CloudedPlanet("aliensPlanet", programPBR, sphereContext, SpaceObjectsList::aliensPlanetTexture, SpaceObjectsList::aliensPlanetNormalTexture, SpaceObjectsList::aliensPlanetCloudsTexture);
-		//spaceObjectsList.push_back(SpaceObjectProperties("aliensPlanet", aliensPlanet));
+		CloudedPlanet* aliensPlanet = new CloudedPlanet("aliensPlanet", programPBREarth, sphereContext, SpaceObjectsList::aliensPlanetTexture, SpaceObjectsList::aliensPlanetNormalTexture, SpaceObjectsList::aliensPlanetCloudsTexture);
+		spaceObjectsList.push_back(SpaceObjectProperties("aliensPlanet", aliensPlanet));
 
 		CloudedPlanet* venus = new CloudedPlanet("venus", programPBREarth, sphereContext, SpaceObjectsList::venusTexture, SpaceObjectsList::venusNormalTexture, SpaceObjectsList::venusTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("venus", venus));
