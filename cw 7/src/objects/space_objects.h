@@ -12,8 +12,6 @@ class SpaceObject {
 		virtual ~SpaceObject() = default;
 		virtual void drawWithPBR(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix, float roughness, float metallic, glm::vec3 lightColor,
 			float loghtPower, glm::vec3 cameraPos, glm::vec3 startPlanetPos, glm::vec3 spotlightPos, glm::vec3 spotlightConeDir) const = 0;
-		//virtual void drawObjectPBR(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix, float roughness, float metallic, glm::vec3 lightColor,
-		//float loghtPower, glm::vec3 cameraPos, glm::vec3 startPlanetPos, glm::vec3 spotlightPos, glm::vec3 spotlightConeDir) const = 0;
 		virtual void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const = 0;
 		virtual std::string getName() const = 0;
 		virtual GLuint getTexture() const = 0;
@@ -56,17 +54,11 @@ public:
 		Core::DrawContext(context);
 		glUseProgram(0);
 	}
-	/*GLuint getTexture() const override { return this->texture; };
-	GLuint getNormals() const override { return this->normals; };
-	GLuint getProgram() const override { return this->program; };
-	Core::RenderContext& getContext() const override { return this->context; };
-	glm::mat4 getModelMatrix() const override { return this->modelMatrix; };
-	std::string getName() const override { return this->name; };*/
 
 
 
 };
-#endif // !DETAILS_h
+#endif
 
 
 

@@ -442,10 +442,10 @@ void init(GLFWwindow* window)
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	glEnable(GL_DEPTH_TEST);
-	program = shaderLoader.CreateProgram("shaders/shader_5_1.vert", "shaders/shader_5_1.frag");
+	program = shaderLoader.CreateProgram("shaders/shader_scene_program.vert", "shaders/shader_scene_program.frag");
 
 
-	programTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex_copy.vert", "shaders/shader_5_1_tex_copy.frag");
+	programTex = shaderLoader.CreateProgram("shaders/texturesPlusNormals.vert", "shaders/texturesPlusNormals.frag");
 
 	detailsTextures::engineDetailTexture = Core::LoadTexture("textures/details/airplane_engine_BaseColor.png");
 	detailsTextures::engineDetailNormal = Core::LoadTexture("textures/details/airplane_engine_Normal.png");
@@ -464,17 +464,11 @@ void init(GLFWwindow* window)
 	asteroidsList.init();
 	player.init();
 	shipToRepair.init();
-	//detailslist.init();
 	sun.init();
 }
 
 void shutdown(GLFWwindow* window)
 {
-
-
-
-
-
 	shaderLoader.DeleteProgram(program);
 }
 

@@ -39,10 +39,9 @@ public:
 		glm::vec3 sunDir = glm::normalize(startPlanetPos);
 
 		Core::SetActiveTexture(texture, "texture1", program, 0);
-		Core::SetActiveTexture(shipScratches, "texture2", program, 1);
-		Core::SetActiveTexture(rust, "texture3", program, 2);
+		Core::SetActiveTexture(texture, "texture2", program, 1);
 
-		Core::SetActiveTexture(normals, "textureNormal", program, 3);
+		Core::SetActiveTexture(normals, "textureNormal", program, 2);
 		glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 		glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
 		glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
