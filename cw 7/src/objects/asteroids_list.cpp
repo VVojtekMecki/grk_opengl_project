@@ -56,7 +56,8 @@ public:
 		asteroidRedTexture = Core::LoadTexture("textures/asteroids/4k_makemake_fictional.jpg");
 		asteroidNormal = Core::LoadTexture("textures/asteroids/asteroid_normal.jpg");
 
-		programTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex_copy.vert", "shaders/shader_5_1_tex_copy.frag");
+		programTex = shaderLoader.CreateProgram("shaders/PBRforEarth.vert", "shaders/PBRforEarth.frag");
+
 
 		loadModelToContext("./models/asteroid.obj", asteroidContext);
 

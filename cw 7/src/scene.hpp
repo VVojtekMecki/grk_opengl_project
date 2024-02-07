@@ -29,11 +29,11 @@ glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
 glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
 
 
-glm::vec3 spotlightPos = glm::vec3(1.4, 1.4, 1.4);
-glm::vec3 spotlightConeDir = glm::vec3(1.4, 1.4, 1.4);
+glm::vec3 spotlightPos = glm::vec3(0.4, 0.4, 0.4);
+glm::vec3 spotlightConeDir = glm::vec3(0.4, 0.4, 0.4);
 
-glm::vec3 spaceshipPos = glm::vec3(-4.f, 0, 0);
-glm::vec3 spaceshipDir = glm::vec3(1.f, 0.f, 0.f);
+glm::vec3 spaceshipPos = glm::vec3(-24.f, 0, 0);
+glm::vec3 spaceshipDir = glm::vec3(1.f, 0.f, 1.f);
 GLuint VAO,VBO;
 
 float aspectRatio = 1.f;
@@ -42,6 +42,8 @@ float lastFrameTime = 0.0f;
 float deltaTime = 0.0f;
 float planetRough = 0.3f;
 float planetMetal = 0.3f;
+float shipRough = 1.3f;
+float shipMetal = 1.5f;
 float lightPower = 25.f;
 glm::vec3 lightColor = glm::vec3(lightPower, lightPower, lightPower);
 
@@ -154,7 +156,8 @@ void renderScene(GLFWwindow* window)
 		glm::mat4 asteroid1Rotate = glm::rotate(timeGl * 0.05f, glm::vec3(0, 1, 0));
 		auto pos = obj->getPosition();
 		glm::mat4 asteroid1Translate = glm::translate(glm::vec3(pos.x, pos.y, pos.z));
-		obj->drawObjectTexture(projectionMatrix, asteroid1Scale*asteroid1Rotate * asteroid1Translate);
+		obj->drawWithPBR(projectionMatrix, asteroid1Scale * asteroid1Rotate * asteroid1Translate, planetRough, planetMetal, lightColor, lightPower, cameraPos,
+			glm::vec3(pos.x, pos.y, pos.z), spotlightPos, spotlightConeDir);
 	}
 
 	//for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
@@ -174,7 +177,7 @@ void renderScene(GLFWwindow* window)
 	glm::mat4 shipModelMatrix = glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f));
 
 	//player.ship->drawObjectTexture(projectionMatrix, shipModelMatrix);
-	player.ship->drawWithPBR(projectionMatrix, shipModelMatrix, planetRough, planetMetal, lightColor, lightPower, cameraPos, glm::vec3(),
+	player.ship->drawWithPBR(projectionMatrix, shipModelMatrix, shipRough, shipMetal, lightColor, lightPower, cameraPos, glm::vec3(),
 		spotlightPos, spotlightConeDir);
 	spotlightPos = spaceshipPos + 0.2 * spaceshipDir;
 	spotlightConeDir = spaceshipDir;
