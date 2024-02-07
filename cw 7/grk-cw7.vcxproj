@@ -50,6 +50,8 @@
     <None Include="shaders\PBRforEarth.vert" />
     <None Include="shaders\clouds_noise.frag" />
     <None Include="shaders\clouds_noise.vert" />
+    <None Include="shaders\PlanetWithAnimatedClouds.frag" />
+    <None Include="shaders\PlanetWithAnimatedClouds.vert" />
     <None Include="shaders\shader_scene_program.frag" />
     <None Include="shaders\shader_scene_program.vert" />
     <None Include="shaders\texturesPlusNormals.frag" />

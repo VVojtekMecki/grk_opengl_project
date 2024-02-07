@@ -50,6 +50,7 @@ private:
 
 	GLuint programPBREarth;
 	GLuint programCloudsAnimation;
+	GLuint programPlanetAnimatedClouds;
 
 	Core::Shader_Loader shaderLoader;
 	Core::RenderContext sphereContext;
@@ -78,12 +79,13 @@ public:
 	void init() {
 		programPBREarth = shaderLoader.CreateProgram("shaders/PBRforEarth.vert", "shaders/PBRforEarth.frag");
 		programCloudsAnimation = shaderLoader.CreateProgram("shaders/clouds_noise.vert", "shaders/clouds_noise.frag");
+		programPlanetAnimatedClouds = shaderLoader.CreateProgram("shaders/PlanetWithAnimatedClouds.vert", "shaders/PlanetWithAnimatedClouds.frag");
 
 
 		loadModelToContext("./models/sphere.obj", sphereContext);
 
 
-		earthTexture = Core::LoadTexture("textures/planets/8k_earth_daymap.jpg");
+		earthTexture = Core::LoadTexture("textures/planets/green_planet.png");
 		earthCloudsTexture = Core::LoadTexture("textures/planets/8k_earth_clouds.jpg");
 		earthNormalTexture = Core::LoadTexture("textures/planets/earth2_normals.png");
 
@@ -113,7 +115,8 @@ public:
 		haumeaNormalTexture = Core::LoadTexture("textures/planets/haumea_normal.jpg");
 
 
-		CloudedPlanet* earth = new CloudedPlanet("earth", programPBREarth, sphereContext, SpaceObjectsList::earthTexture, SpaceObjectsList::earthNormalTexture, SpaceObjectsList::earthCloudsTexture);
+		//CloudedPlanet* earth = new CloudedPlanet("earth", programPBREarth, sphereContext, SpaceObjectsList::earthTexture, SpaceObjectsList::earthNormalTexture, SpaceObjectsList::earthCloudsTexture);
+		CloudsAnimatedPlanet* earth = new CloudsAnimatedPlanet("earth", programPlanetAnimatedClouds, sphereContext, SpaceObjectsList::earthTexture, SpaceObjectsList::earthNormalTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("earth", earth));
 
 		CloudedPlanet* moon = new CloudedPlanet("moon", programPBREarth, sphereContext, SpaceObjectsList::moonTexture, SpaceObjectsList::moonNormalTexture, SpaceObjectsList::moonTexture);

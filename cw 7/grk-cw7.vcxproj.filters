@@ -115,58 +115,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\shader_5_sun.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\shader_5_sun.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\shader_5_1.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\shader_5_1.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\shader_5_1_tex.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\shader_5_1_tex.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\shader_earth.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\shader_earth.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\shader_ship.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\shader_ship.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\shader_5_1_tex_copy.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\shader_5_1_tex_copy.frag">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="shaders\shader_skybox.vert">
       <Filter>Shader Files</Filter>
     </None>
     <None Include="shaders\shader_skybox.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\shader_pbr.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\shader_pbr.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\PBR.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shaders\PBR.vert">
       <Filter>Shader Files</Filter>
     </None>
     <None Include="shaders\PBRforEarth.vert">
@@ -187,5 +139,32 @@
     <None Include="shaders\shader_sun.vert">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="shaders\PBRforShip.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PBRforShip.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PlanetWithAnimatedClouds.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PlanetWithAnimatedClouds.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_scene_program.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_scene_program.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\texturesPlusNormals.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\texturesPlusNormals.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\README.txt" />
   </ItemGroup>
 </Project>

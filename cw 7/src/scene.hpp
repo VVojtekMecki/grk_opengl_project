@@ -196,8 +196,8 @@ void renderScene(GLFWwindow* window)
 
 	std::map<std::string, glm::mat4> modelMatrixMap = {
 		{ "sun", glm::mat4() * glm::scale(glm::vec3(8.f)) },
-		{ "earth", glm::eulerAngleY(timeGl / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
-		{ "moon", glm::eulerAngleY(timeGl / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::eulerAngleY(timeGl) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)) },
+		{ "earth", glm::eulerAngleY(timeGl / 30) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
+		{ "moon", glm::eulerAngleY(timeGl / 30) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::eulerAngleY(timeGl) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)) },
 		{ "mars", glm::eulerAngleY((timeGl + 6) / 3) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(0.7f))},
 		{ "aliensPlanet", glm::eulerAngleY(timeGl / 3.3f) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(1.5f))},
 		{ "venus", glm::eulerAngleY(timeGl / 4) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
@@ -497,13 +497,7 @@ void processInput(GLFWwindow* window)
 		spaceshipDir = glm::vec3(glm::eulerAngleY(angleSpeed) * glm::vec4(spaceshipDir, 0));
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		spaceshipDir = glm::vec3(glm::eulerAngleY(-angleSpeed) * glm::vec4(spaceshipDir, 0));
-	//jasno??
-	float powerSpeed = 0.05f;
 	
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && lightPower < 25.f)
-		lightPower += powerSpeed;
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && lightPower > 2.5f)
-		lightPower -= powerSpeed;
 
 	lightColor = glm::vec3(lightPower, lightPower, lightPower);
 
