@@ -3,7 +3,7 @@
 #ifndef SHIP_H
 #define SHIP_H
 
-class Ship : public SpaceObject {
+class Ship{
 
 	GLuint rust;
 	GLuint shipScratches;
@@ -26,7 +26,7 @@ public:
 	}
 
 	void drawWithPBR(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix, float roughness, float metallic,
-		glm::vec3 lightColor, float lightPower, glm::vec3 cameraPos, glm::vec3 startPlanetPos, glm::vec3 spotlightPos, glm::vec3 spotlightConeDir) const override {
+		glm::vec3 lightColor, float lightPower, glm::vec3 cameraPos, glm::vec3 startPlanetPos, glm::vec3 spotlightPos, glm::vec3 spotlightConeDir) {
 		glUseProgram(program);
 		glm::vec3 sunColor = glm::vec3(0.7f, 0.7f, 0.7f)/*   *5  */;
 
@@ -63,12 +63,6 @@ public:
 		Core::DrawContext(context);
 		glUseProgram(0);
 	}
-	GLuint getTexture() const override { return this->texture; };
-	GLuint getNormals() const override { return this->normals; };
-	GLuint getProgram() const override { return this->program; };
-	Core::RenderContext& getContext() const override { return this->context; };
-	glm::mat4 getModelMatrix() const override { return this->modelMatrix; };
-	std::string getName() const override { return this->name; };
 };
 
 #endif

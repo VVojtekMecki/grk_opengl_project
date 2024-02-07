@@ -20,6 +20,7 @@
 #include "objects/player_ship.cpp"
 #include "objects/skybox.h"
 #include "objects/asteroids_list.cpp"
+#include "objects/SunObject.cpp"
 
 GLuint program;
 
@@ -32,7 +33,7 @@ glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 0.f);
 glm::vec3 spotlightPos = glm::vec3(0.4, 0.4, 0.4);
 glm::vec3 spotlightConeDir = glm::vec3(0.4, 0.4, 0.4);
 
-glm::vec3 spaceshipPos = glm::vec3(-24.f, 0, 0);
+glm::vec3 spaceshipPos = glm::vec3(-40.f, 1., 0);
 glm::vec3 spaceshipDir = glm::vec3(1.f, 0.f, 1.f);
 GLuint VAO,VBO;
 
@@ -63,25 +64,33 @@ glm::mat4 createCameraMatrix()
 	return cameraMatrix;
 }
 
+//glm::mat4 createPerspectiveMatrix()
+//{
+//	
+//	glm::mat4 perspectiveMatrix;
+//	float n = 0.05;
+//	float f = 1000.;
+//	float a1 = glm::min(aspectRatio, 1.f);
+//	float a2 = glm::min(1 / aspectRatio, 1.f);
+//	perspectiveMatrix = glm::mat4({
+//		1,0.,0.,0.,
+//		0.,aspectRatio,0.,0.,
+//		0.,0.,(f+n) / (n - f),2*f * n / (n - f),
+//		0.,0.,-1.,0.,
+//		});
+//
+//	
+//	perspectiveMatrix=glm::transpose(perspectiveMatrix);
+//
+//	return perspectiveMatrix;
+//}
+
 glm::mat4 createPerspectiveMatrix()
 {
-	
-	glm::mat4 perspectiveMatrix;
-	float n = 0.05;
-	float f = 1000.;
-	float a1 = glm::min(aspectRatio, 1.f);
-	float a2 = glm::min(1 / aspectRatio, 1.f);
-	perspectiveMatrix = glm::mat4({
-		1,0.,0.,0.,
-		0.,aspectRatio,0.,0.,
-		0.,0.,(f+n) / (n - f),2*f * n / (n - f),
-		0.,0.,-1.,0.,
-		});
-
-	
-	perspectiveMatrix=glm::transpose(perspectiveMatrix);
-
-	return perspectiveMatrix;
+	float fov = glm::radians(35.0f); // FOV
+	float n = 0.05f; // Near plane
+	float f = 1000.0f; // Far plane
+	return glm::perspective(fov, aspectRatio, n, f);
 }
 
 SpaceObjectsList spaceObjectsList(glfwGetTime(), createPerspectiveMatrix()* createCameraMatrix());
@@ -91,6 +100,8 @@ AsteroidsList asteroidsList;
 PlayerShip player;
 
 Skybox skybox;
+
+SunObject sun;
 
 void renderScene(GLFWwindow* window)
 {
@@ -112,25 +123,18 @@ void renderScene(GLFWwindow* window)
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	std::map<std::string, glm::mat4> modelMatrixMap = {
-		{ "sun", glm::mat4() * glm::scale(glm::vec3(4.f)) },
-		{ "earth", glm::eulerAngleY(timeGl / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
-		{ "moon", glm::eulerAngleY(timeGl / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(timeGl) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)) },
-		{ "mars", glm::eulerAngleY((timeGl + 6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f))},
-		{ "aliensPlanet", glm::eulerAngleY(timeGl / 3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f))},
-		{ "venus", glm::eulerAngleY(timeGl / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
-		{ "humea", glm::eulerAngleY(timeGl / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f))},
-		{ "mercury", glm::eulerAngleY(timeGl / 7) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f))}
+		{ "sun", glm::mat4() * glm::scale(glm::vec3(8.f)) },
+		{ "earth", glm::eulerAngleY(timeGl / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
+		{ "moon", glm::eulerAngleY(timeGl / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::eulerAngleY(timeGl) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)) },
+		{ "mars", glm::eulerAngleY((timeGl + 6) / 3) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(0.7f))},
+		{ "aliensPlanet", glm::eulerAngleY(timeGl / 3.3f) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(1.5f))},
+		{ "venus", glm::eulerAngleY(timeGl / 4) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
+		{ "humea", glm::eulerAngleY(timeGl / 5) * glm::translate(glm::vec3(40.f, 0, 0)) * glm::scale(glm::vec3(2.f))},
+		{ "mercury", glm::eulerAngleY(timeGl / 7) * glm::translate(glm::vec3(45.f, 0, 0)) * glm::scale(glm::vec3(0.79f))},
+		{ "cloudsAnimation", glm::eulerAngleY(timeGl / 3)* glm::translate(glm::vec3(50.f, 0, 0))* glm::scale(glm::vec3(1.8f))},
 	};
 
 	std::map<std::string, glm::vec3> startPlanetPosition = {
-		//{ "sun", glm::mat4()},
-		//{ "earth",glm::eulerAngleY(time / 3)},
-		//{ "moon",  glm::eulerAngleY(time / 3)},
-		//{ "mars", glm::eulerAngleY((time + 6) / 3)},
-		//{ "aliensPlanet", glm::eulerAngleY(time / 3.3f)},
-		//{ "venus", glm::eulerAngleY(time / 4)},
-		//{ "humea", glm::eulerAngleY(time / 5)},
-		//{ "mercury", glm::eulerAngleY(time / 7)},
 		{ "sun", glm::vec3()},
 		{ "earth",glm::vec3(10.f, 0, 0)},
 		{ "moon",  glm::vec3(10.f, 0, 0)},
@@ -139,6 +143,7 @@ void renderScene(GLFWwindow* window)
 		{ "venus", glm::vec3(25.f, 0, 0)},
 		{ "humea", glm::vec3(30.f, 0, 0)},
 		{ "mercury",glm::vec3(35.f, 0, 0)},
+		{ "cloudsAnimation", glm::vec3(50.f, 0, 0)},
 	};
 	glm::mat4 projectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 
@@ -146,6 +151,8 @@ void renderScene(GLFWwindow* window)
 	//	obj.object->drawObjectTexture(projectionMatrix, modelMatrixMap.at(obj.name));
 	//}
 	// 
+	sun.object->drawObject(projectionMatrix, modelMatrixMap.at("sun"), cameraPos, lightPower);
+
 	for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
 		obj.object->drawWithPBR(projectionMatrix, modelMatrixMap.at(obj.name), planetRough, planetMetal, lightColor, lightPower, cameraPos, 
 			startPlanetPosition.at(obj.name), spotlightPos, spotlightConeDir);
@@ -215,6 +222,7 @@ void init(GLFWwindow* window)
 	spaceObjectsList.init();
 	asteroidsList.init();
 	player.init();
+	sun.init();
 }
 
 void shutdown(GLFWwindow* window)

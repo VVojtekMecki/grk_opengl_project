@@ -18,6 +18,7 @@
     <ClCompile Include="src\objects\planets_list.cpp" />
     <ClCompile Include="src\objects\player_ship.cpp" />
     <ClCompile Include="src\objects\space_objects.h" />
+    <ClCompile Include="src\objects\SunObject.cpp" />
     <ClCompile Include="src\Render_Utils.cpp" />
     <ClCompile Include="src\Shader_Loader.cpp" />
     <ClCompile Include="src\SOIL\image_DXT.c" />
@@ -47,6 +48,8 @@
     <None Include="shaders\PBR.vert" />
     <None Include="shaders\PBRforEarth.frag" />
     <None Include="shaders\PBRforEarth.vert" />
+    <None Include="shaders\clouds_noise.frag" />
+    <None Include="shaders\clouds_noise.vert" />
     <None Include="shaders\shader_5_1.frag" />
     <None Include="shaders\shader_5_1.vert" />
     <None Include="shaders\shader_5_1_tex.frag" />
@@ -63,6 +66,8 @@
     <None Include="shaders\shader_ship.vert" />
     <None Include="shaders\shader_skybox.frag" />
     <None Include="shaders\shader_skybox.vert" />
+    <None Include="shaders\shader_sun.frag" />
+    <None Include="shaders\shader_sun.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F2FC2E8F-CBA6-49D7-8B73-4BFBCB64D310}</ProjectGuid>
