@@ -4,7 +4,7 @@
 #define SHIPTOREPAIR_H
 
 
-class Repairment: public SpaceObject {
+class Repairment {
 public:
 	std::string name;
 	GLuint texture;
@@ -27,7 +27,7 @@ public:
 
 
 
-	void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const override {
+	void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) {
 
 		glUseProgram(program);
 		glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
@@ -43,14 +43,14 @@ public:
 		Core::DrawContext(context);
 		glUseProgram(0);
 	}
-	GLuint getTexture() const override { return this->texture; };
+	/*GLuint getTexture() const override { return this->texture; };
 	GLuint getNormals() const override { return this->normalRepaired; };
 	GLuint getNormalsDamaged() const { return this->normalsDamaged; };
 
 	GLuint getProgram() const override { return this->program; };
 	Core::RenderContext& getContext() const override { return this->context; };
 	glm::mat4 getModelMatrix() const override { return this->modelMatrix; };
-	std::string getName() const override { return this->name; };
+	std::string getName() const override { return this->name; };*/
 
 	
 

@@ -22,7 +22,7 @@
 #include "objects/asteroids_list.cpp"
 #include "objects/details_list.cpp"
 #include "objects/shipToRepairHeader.h"
-
+#include "objects/SunObject.cpp"
 
 GLuint program;
 GLuint programTex;
@@ -35,8 +35,12 @@ glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 1.f);
 
 glm::mat4 shipModelMatrix;
 
-glm::vec3 spaceshipPos = glm::vec3(-4.f, 0, 0);
-glm::vec3 spaceshipDir = glm::vec3(1.f, 0.f, 0.f);
+
+glm::vec3 spotlightPos = glm::vec3(0.4, 0.4, 0.4);
+glm::vec3 spotlightConeDir = glm::vec3(0.4, 0.4, 0.4);
+
+glm::vec3 spaceshipPos = glm::vec3(-40.f, 1., 0);
+glm::vec3 spaceshipDir = glm::vec3(1.f, 0.f, 1.f);
 GLuint VAO,VBO;
 
 namespace detailsTextures {
@@ -86,6 +90,12 @@ float aspectRatio = 1.f;
 
 float lastFrameTime = 0.0f;
 float deltaTime = 0.0f;
+float planetRough = 0.3f;
+float planetMetal = 0.3f;
+float shipRough = 1.3f;
+float shipMetal = 1.5f;
+float lightPower = 20.f;
+glm::vec3 lightColor = glm::vec3(lightPower, lightPower, lightPower);
 
 glm::mat4 createCameraMatrix()
 {
@@ -103,25 +113,33 @@ glm::mat4 createCameraMatrix()
 	return cameraMatrix;
 }
 
+//glm::mat4 createPerspectiveMatrix()
+//{
+//	
+//	glm::mat4 perspectiveMatrix;
+//	float n = 0.05;
+//	float f = 1000.;
+//	float a1 = glm::min(aspectRatio, 1.f);
+//	float a2 = glm::min(1 / aspectRatio, 1.f);
+//	perspectiveMatrix = glm::mat4({
+//		1,0.,0.,0.,
+//		0.,aspectRatio,0.,0.,
+//		0.,0.,(f+n) / (n - f),2*f * n / (n - f),
+//		0.,0.,-1.,0.,
+//		});
+//
+//	
+//	perspectiveMatrix=glm::transpose(perspectiveMatrix);
+//
+//	return perspectiveMatrix;
+//}
+
 glm::mat4 createPerspectiveMatrix()
 {
-	
-	glm::mat4 perspectiveMatrix;
-	float n = 0.05;
-	float f = 1000.;
-	float a1 = glm::min(aspectRatio, 1.f);
-	float a2 = glm::min(1 / aspectRatio, 1.f);
-	perspectiveMatrix = glm::mat4({
-		1,0.,0.,0.,
-		0.,aspectRatio,0.,0.,
-		0.,0.,(f+n) / (n - f),2*f * n / (n - f),
-		0.,0.,-1.,0.,
-		});
-
-	
-	perspectiveMatrix=glm::transpose(perspectiveMatrix);
-
-	return perspectiveMatrix;
+	float fov = glm::radians(35.0f); // FOV
+	float n = 0.05f; // Near plane
+	float f = 1000.0f; // Far plane
+	return glm::perspective(fov, aspectRatio, n, f);
 }
 
 SpaceObjectsList spaceObjectsList(glfwGetTime(), createPerspectiveMatrix()* createCameraMatrix());
@@ -154,6 +172,8 @@ void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 m
 
 
 
+SunObject sun;
+
 void renderScene(GLFWwindow* window)
 {
     	
@@ -175,20 +195,39 @@ void renderScene(GLFWwindow* window)
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	std::map<std::string, glm::mat4> modelMatrixMap = {
-		{ "sun", glm::mat4() * glm::scale(glm::vec3(4.f)) },
-		{ "earth", glm::eulerAngleY(timeGl / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
-		{ "moon", glm::eulerAngleY(timeGl / 3) * glm::translate(glm::vec3(10.f, 0, 0)) * glm::eulerAngleY(timeGl) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)) },
-		{ "mars", glm::eulerAngleY((timeGl + 6) / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(0.7f))},
-		{ "aliensPlanet", glm::eulerAngleY(timeGl / 3.3f) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(1.5f))},
-		{ "venus", glm::eulerAngleY(timeGl / 4) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
-		{ "humea", glm::eulerAngleY(timeGl / 5) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(2.f))},
-		{ "mercury", glm::eulerAngleY(timeGl / 7) * glm::translate(glm::vec3(35.f, 0, 0)) * glm::scale(glm::vec3(0.79f))}
+		{ "sun", glm::mat4() * glm::scale(glm::vec3(8.f)) },
+		{ "earth", glm::eulerAngleY(timeGl / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::scale(glm::vec3(1.8f)) },
+		{ "moon", glm::eulerAngleY(timeGl / 3) * glm::translate(glm::vec3(15.f, 0, 0)) * glm::eulerAngleY(timeGl) * glm::translate(glm::vec3(3.f, 0, 0)) * glm::scale(glm::vec3(0.6f)) },
+		{ "mars", glm::eulerAngleY((timeGl + 6) / 3) * glm::translate(glm::vec3(20.f, 0, 0)) * glm::scale(glm::vec3(0.7f))},
+		{ "aliensPlanet", glm::eulerAngleY(timeGl / 3.3f) * glm::translate(glm::vec3(25.f, 0, 0)) * glm::scale(glm::vec3(1.5f))},
+		{ "venus", glm::eulerAngleY(timeGl / 4) * glm::translate(glm::vec3(30.f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
+		{ "humea", glm::eulerAngleY(timeGl / 5) * glm::translate(glm::vec3(40.f, 0, 0)) * glm::scale(glm::vec3(2.f))},
+		{ "mercury", glm::eulerAngleY(timeGl / 7) * glm::translate(glm::vec3(45.f, 0, 0)) * glm::scale(glm::vec3(0.79f))},
+		{ "cloudsAnimation", glm::eulerAngleY(timeGl / 3)* glm::translate(glm::vec3(50.f, 0, 0))* glm::scale(glm::vec3(1.8f))},
 	};
 
+	std::map<std::string, glm::vec3> startPlanetPosition = {
+		{ "sun", glm::vec3()},
+		{ "earth",glm::vec3(10.f, 0, 0)},
+		{ "moon",  glm::vec3(10.f, 0, 0)},
+		{ "mars", glm::vec3(15.f, 0, 0)},
+		{ "aliensPlanet", glm::vec3(20.f, 0, 0)},
+		{ "venus", glm::vec3(25.f, 0, 0)},
+		{ "humea", glm::vec3(30.f, 0, 0)},
+		{ "mercury",glm::vec3(35.f, 0, 0)},
+		{ "cloudsAnimation", glm::vec3(50.f, 0, 0)},
+	};
 	glm::mat4 projectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 
+	//for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
+	//	obj.object->drawObjectTexture(projectionMatrix, modelMatrixMap.at(obj.name));
+	//}
+	// 
+	sun.object->drawObject(projectionMatrix, modelMatrixMap.at("sun"), cameraPos, lightPower);
+
 	for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
-		obj.object->drawObjectTexture(projectionMatrix, modelMatrixMap.at(obj.name));
+		obj.object->drawWithPBR(projectionMatrix, modelMatrixMap.at(obj.name), planetRough, planetMetal, lightColor, lightPower, cameraPos, 
+			startPlanetPosition.at(obj.name), spotlightPos, spotlightConeDir);
 	}
 
 	for (Asteroid* obj : asteroidsList.objectsList) {
@@ -196,9 +235,14 @@ void renderScene(GLFWwindow* window)
 		glm::mat4 asteroid1Rotate = glm::rotate(timeGl * 0.05f, glm::vec3(0, 1, 0));
 		auto pos = obj->getPosition();
 		glm::mat4 asteroid1Translate = glm::translate(glm::vec3(pos.x, pos.y, pos.z));
-		obj->drawObjectTexture(projectionMatrix, asteroid1Scale*asteroid1Rotate * asteroid1Translate);
+		obj->drawWithPBR(projectionMatrix, asteroid1Scale * asteroid1Rotate * asteroid1Translate, planetRough, planetMetal, lightColor, lightPower, cameraPos,
+			glm::vec3(pos.x, pos.y, pos.z), spotlightPos, spotlightConeDir);
 	}
 
+	//for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
+	//	obj.object->drawWithPBR(projectionMatrix, modelMatrixMap.at(obj.name), planetRough, planetMetal, lightColor, lightPower, cameraPos,
+	//		startPlanetPosition.at(obj.name), spotlightPos, spotlightConeDir);
+	//}
 
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::normalize(glm::cross(spaceshipSide, spaceshipDir));
@@ -211,7 +255,7 @@ void renderScene(GLFWwindow* window)
 
 	shipModelMatrix = glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f));
 
-	player.ship->drawObjectTexture(projectionMatrix, shipModelMatrix);
+	//player.ship->drawObjectTexture(projectionMatrix, shipModelMatrix);
 
 
 	std::map<std::string, glm::mat4> shipRepairMatrixMap = {
@@ -319,7 +363,7 @@ void renderScene(GLFWwindow* window)
 	spaceshipPosCOPY = spaceshipPos;
 	spaceshipPosCOPY.y -= 0.6;
 	//crew member
-	crewMemberMatrix = glm::eulerAngleX(timeGl / 15) * glm::translate(glm::vec3(3.5f, -7.f, 0)) * glm::eulerAngleY(timeGl / 15);
+	crewMemberMatrix = glm::eulerAngleX(timeGl / 15) * glm::translate(glm::vec3(10.f, -7.f, 0)) * glm::eulerAngleY(timeGl / 15);
 	glm::vec3 crewDetailTranslationVec = glm::vec3(crewMemberMatrix[3]);
 	if (glm::distance(shipTranslationVec, crewDetailTranslationVec) < 1.0f && !isDragging)
 	{
@@ -362,6 +406,11 @@ void renderScene(GLFWwindow* window)
 
 
 
+	//player.ship->drawObjectTexture(projectionMatrix, shipModelMatrix);
+	player.ship->drawWithPBR(projectionMatrix, shipModelMatrix, shipRough, shipMetal, lightColor, lightPower, cameraPos, glm::vec3(),
+		spotlightPos, spotlightConeDir);
+	spotlightPos = spaceshipPos + 0.2 * spaceshipDir;
+	spotlightConeDir = spaceshipDir;
 	glfwSwapBuffers(window);
 }
 
@@ -416,6 +465,7 @@ void init(GLFWwindow* window)
 	player.init();
 	shipToRepair.init();
 	//detailslist.init();
+	sun.init();
 }
 
 void shutdown(GLFWwindow* window)
@@ -453,6 +503,15 @@ void processInput(GLFWwindow* window)
 		spaceshipDir = glm::vec3(glm::eulerAngleY(angleSpeed) * glm::vec4(spaceshipDir, 0));
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		spaceshipDir = glm::vec3(glm::eulerAngleY(-angleSpeed) * glm::vec4(spaceshipDir, 0));
+	//jasno??
+	float powerSpeed = 0.05f;
+	
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && lightPower < 25.f)
+		lightPower += powerSpeed;
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && lightPower > 2.5f)
+		lightPower -= powerSpeed;
+
+	lightColor = glm::vec3(lightPower, lightPower, lightPower);
 
 
 	if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) && (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS))

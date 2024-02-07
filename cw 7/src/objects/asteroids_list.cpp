@@ -10,7 +10,7 @@
 class AsteroidsList {
 
 private:
-	int amountAsteroids = 100;
+	int amountAsteroids = 400;
 	int positionX, positionY, positionZ = 0;
 	
 	GLuint asteroidGreyTexture;
@@ -56,24 +56,25 @@ public:
 		asteroidRedTexture = Core::LoadTexture("textures/asteroids/4k_makemake_fictional.jpg");
 		asteroidNormal = Core::LoadTexture("textures/asteroids/asteroid_normal.jpg");
 
-		programTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex_copy.vert", "shaders/shader_5_1_tex_copy.frag");
+		programTex = shaderLoader.CreateProgram("shaders/PBRforEarth.vert", "shaders/PBRforEarth.frag");
+
 
 		loadModelToContext("./models/asteroid.obj", asteroidContext);
 
 		srand(static_cast<unsigned>(time(0)));
 		for (int asteroid = 0; asteroid < amountAsteroids; asteroid++) {
-			positionX = getRandomNumber(-65, 65);
-			positionY = getRandomNumber(-35, 35);
-			positionZ = getRandomNumber(-35, 35);
+			positionX = getRandomNumber(-100, 100);
+			positionY = getRandomNumber(-60, 60);
+			positionZ = getRandomNumber(-60, 60);
 
 			bool truePositionZ = false;
-			if (positionY > -8 && positionY < 8) {
+			if (positionY > -25 && positionY < 25) {
 				while (truePositionZ != true) {
-					if (positionZ < -8 || positionZ > 8) {
+					if (positionZ < -15 || positionZ > 15) {
 						truePositionZ = true;
 						break;
 					}
-					positionZ = getRandomNumber(-35, 35);
+					positionZ = getRandomNumber(-60, 60);
 				}
 			}
 

@@ -66,6 +66,9 @@
     <ClCompile Include="src\objects\asteroids_list.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\objects\SunObject.cpp">
+      <Filter>Header Files\objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\objload.h">
@@ -152,6 +155,36 @@
       <Filter>Shader Files</Filter>
     </None>
     <None Include="shaders\shader_skybox.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_pbr.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_pbr.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PBR.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PBR.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PBRforEarth.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\PBRforEarth.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\clouds_noise.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\clouds_noise.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_sun.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\shader_sun.vert">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
