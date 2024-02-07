@@ -141,8 +141,8 @@ public:
 		CloudedPlanet* mercury = new CloudedPlanet("mercury", programPBREarth, sphereContext, SpaceObjectsList::mercuryTexture, SpaceObjectsList::mercuryNormalTexture, SpaceObjectsList::mercuryTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("mercury", mercury));
 
-		CloudsAnimationPlanet* cloudsAnimation = new CloudsAnimationPlanet("cloudsAnimation", programCloudsAnimation, sphereContext, emptyTexture, emptyNormals);
-		spaceObjectsList.push_back(SpaceObjectProperties("cloudsAnimation", cloudsAnimation));
+		/*CloudsAnimationPlanet* cloudsAnimation = new CloudsAnimationPlanet("cloudsAnimation", programCloudsAnimation, sphereContext, emptyTexture, emptyNormals);
+		spaceObjectsList.push_back(SpaceObjectProperties("cloudsAnimation", cloudsAnimation));*/
 	}
 
 	void updateTime() {

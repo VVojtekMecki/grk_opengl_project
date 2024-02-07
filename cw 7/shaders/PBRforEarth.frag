@@ -1,6 +1,6 @@
 #version 430 core
 
-float AMBIENT = 0.03;
+float AMBIENT = 0.25;
 float PI = 3.14;
 
 uniform sampler2D depthMap;
@@ -121,17 +121,28 @@ void main()
     vec3 normal = normalize((N*2.0-1.0).xyz);
 
 
+    //COMMENT TO USE 2 TEXTURES
+    //vec3 color = texture1Color.rgb;
+
+    //finalColor = mix(finalColor, asteroidColor.rgb, 0.3);
+    //vec3 finalColor = mix(vec3(1.0), texture.rgb, rustColor.r) + asteroidColor.rgb * 0.2;
+	//vec3 normal = vec3(0,0,1);
+    //vec3 normal = normalize(vecNormal);
+
     vec3 viewDir = normalize(viewDirTS);
+    //vec3 viewDir = normalize(cameraPos-worldPos);
 
 	vec3 lightDir = normalize(lightDirTS);
+    //vec3 lightDir = normalize(lightPos-worldPos);
 
+    //UNCOMMENT IF YOU WANT MIX 2 TEXTURES
     vec3 finalColor = mix(vec3(1.0), texture1Color.rgb, texture2Color.r);
     float diffuse = max(0, dot(normal, lightDir));
     vec3 color = ((finalColor * min(1, AMBIENT + diffuse))).rgb;
 
 
 	vec3 ambient = AMBIENT*color;
-	vec3 attenuatedlightColor = lightColor/pow(length(lightPos-worldPos),2)*30;
+	vec3 attenuatedlightColor = lightColor/pow(length(lightPos-worldPos),2);
 	vec3 ilumination;
 	ilumination = ambient+PBRLight(lightDir,attenuatedlightColor,normal,viewDir,color);
 	
@@ -148,6 +159,7 @@ void main()
 	ilumination=ilumination+PBRLight(sunDir,sunColor,normal,viewDir,color);
 
 
-	vec3 colorNoDiffuse = vec3(color - exp(-ilumination*exposition));
-    outColor = vec4(colorNoDiffuse * min(1,AMBIENT + diffuse),1);
+	outColor = vec4(color - exp(-ilumination*exposition),1);
+	//outColor = vec4(roughness,metallic,0,1);
+    //outColor = vec4(test;
 }

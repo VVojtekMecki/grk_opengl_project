@@ -30,14 +30,15 @@ public:
 	PlayerShip() {};
 
 	void init() {
-		programShip = shaderLoader.CreateProgram("shaders/shader_ship.vert", "shaders/shader_ship.frag");
+		programShip = shaderLoader.CreateProgram("shaders/PBR.vert", "shaders/PBR.frag");
 		programPBR = shaderLoader.CreateProgram("shaders/PBRforEarth.vert", "shaders/PBRforEarth.frag");
+
 
 		loadModelToContext("./models/SciFi_Fighter.obj", shipContext);
 
 		shipTexture = Core::LoadTexture("textures/spaceship/SF_Fighter-Albedo.jpg");
 		shipNormalTexture = Core::LoadTexture("textures/spaceship/SF_Fighter_Normal.jpg");
-		this->ship = new Ship("player_ship", programPBR, shipContext, shipTexture, shipNormalTexture);
+		this->ship = new Ship("player_ship", programShip, shipContext, shipTexture, shipNormalTexture);
 		this->ship->init();
 	};
 };
