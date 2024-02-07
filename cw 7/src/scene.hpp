@@ -20,6 +20,7 @@
 #include "objects/player_ship.cpp"
 #include "objects/skybox.h"
 #include "objects/asteroids_list.cpp"
+#include "objects/SunObject.cpp"
 
 GLuint program;
 
@@ -90,6 +91,8 @@ PlayerShip player;
 
 Skybox skybox;
 
+SunObject sun;
+
 void renderScene(GLFWwindow* window)
 {
 
@@ -138,6 +141,7 @@ void renderScene(GLFWwindow* window)
 		{ "venus", glm::vec3(25.f, 0, 0)},
 		{ "humea", glm::vec3(30.f, 0, 0)},
 		{ "mercury",glm::vec3(35.f, 0, 0)},
+		{ "cloudsAnimation", glm::vec3(50.f, 0, 0)},
 	};
 	glm::mat4 projectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 
@@ -145,6 +149,8 @@ void renderScene(GLFWwindow* window)
 	//	obj.object->drawObjectTexture(projectionMatrix, modelMatrixMap.at(obj.name));
 	//}
 	// 
+	sun.object->drawObject(projectionMatrix, modelMatrixMap.at("sun"), cameraPos, lightPower);
+
 	for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
 		obj.object->drawWithPBR(projectionMatrix, modelMatrixMap.at(obj.name), planetRough, planetMetal, lightColor, lightPower, cameraPos, 
 			startPlanetPosition.at(obj.name), spotlightPos, spotlightConeDir);
@@ -213,6 +219,7 @@ void init(GLFWwindow* window)
 	spaceObjectsList.init();
 	asteroidsList.init();
 	player.init();
+	sun.init();
 }
 
 void shutdown(GLFWwindow* window)

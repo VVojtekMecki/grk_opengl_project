@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 	float height = 1080;
 
 	// tworzenie okna za pomoca glfw
-	GLFWwindow* window = glfwCreateWindow(width, height, "FirstWindow", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(width, height, "Repair mission", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;

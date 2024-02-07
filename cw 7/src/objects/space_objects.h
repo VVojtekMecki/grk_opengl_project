@@ -182,7 +182,7 @@ public:
 #ifndef SUN_H
 #define SUN_H
 
-class Sun : public SpaceObject {
+class Sun {
 	public:
 		std::string name;
 		GLuint texture;
@@ -193,8 +193,9 @@ class Sun : public SpaceObject {
 	public: 
 		Sun(std::string name, GLuint program, Core::RenderContext& context, GLuint texture)
 		: program(program), context(context), texture(texture), name(name) {}
+
 		void drawWithPBR(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix, float roughness, float metallic,
-			glm::vec3 lightColor, float lightPower, glm::vec3 cameraPos, glm::vec3 startPlanetPos, glm::vec3 spotlightPos, glm::vec3 spotlightConeDir) const override {
+			glm::vec3 lightColor, float lightPower, glm::vec3 cameraPos, glm::vec3 startPlanetPos, glm::vec3 spotlightPos, glm::vec3 spotlightConeDir) {
 			glUseProgram(program);
 			glm::vec3 sunPos = glm::vec3();
 			glm::vec3 sunColor = glm::vec3(0.9f, 0.9f, 0.7f)/*   *5  */;
@@ -227,7 +228,7 @@ class Sun : public SpaceObject {
 		}
 
 
-		void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) const override {
+		void drawObjectTexture(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix) {
 			glUseProgram(program);
 			glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 			glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
@@ -239,12 +240,26 @@ class Sun : public SpaceObject {
 			glUseProgram(0);
 		}
 
-		GLuint getTexture() const override { return this->texture; };
-		GLuint getNormals() const override { return NULL; };
-		GLuint getProgram() const override { return this->program; };
-		Core::RenderContext& getContext() const override { return this->context; };
-		glm::mat4 getModelMatrix() const override { return this->modelMatrix; };
-		std::string getName() const override { return this->name; };
+		void drawObject(glm::mat4 viewProjectionMatrix, glm::mat4 modelMatrix, glm::vec3 cameraPos, float lightPower) {
+			glm::vec3 sunPos = glm::vec3();
+			glm::vec3 lightColor = glm::vec3(lightPower, lightPower, lightPower);
+			glUseProgram(program);
+			Core::SetActiveTexture(texture, "colorTexture", program, 0);
+			glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+			glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
+			glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+
+			glUniform3f(glGetUniformLocation(program, "lightPos"), sunPos.x, sunPos.y, sunPos.z);
+			glUniform3f(glGetUniformLocation(program, "lightColor"), lightColor.x, lightColor.y, lightColor.z);
+
+			glUniform3f(glGetUniformLocation(program, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+
+			float time = glfwGetTime();
+			glUniform1f(glGetUniformLocation(program, "u_time"), time);
+
+			Core::DrawContext(context);
+			glUseProgram(0);
+		}
 };
 
 #endif
