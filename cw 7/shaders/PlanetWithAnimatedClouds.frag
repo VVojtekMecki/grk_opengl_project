@@ -148,7 +148,7 @@ vec4 getNoiseColor() {
     vec2 st = fragTexCoord.xy;
     vec2 mirroredSt = vec2(1.0 - st.x, st.y);
 
-    float timeOffset = time * 0.07;
+    float timeOffset = time * 0.01;
     st.x -= timeOffset;
     mirroredSt.x += timeOffset;
 
@@ -181,7 +181,7 @@ void main()
 	vec3 lightDir = normalize(lightDirTS);
 
 
-    vec3 finalColor = mix(texture1Color.rgb, textureNoise.rgb, 0.8);
+    vec3 finalColor = mix(texture1Color.rgb, textureNoise.rgb*2, 0.3);
     
     
     float diffuse = max(0, dot(normal, lightDir));
