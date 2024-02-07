@@ -81,13 +81,11 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0){
 vec3 PBRLight(vec3 lightDir, vec3 radiance, vec3 normal, vec3 V, vec3 color){
 	float diffuse=max(0,dot(normal,lightDir));
 
-	//vec3 V = normalize(cameraPos-worldPos);
 	vec3 F0 = vec3(0.04); 
     F0 = mix(F0, color, metallic);
 
     vec3 H = normalize(V + lightDir);    
         
-    // cook-torrance brdf
     float NDF = DistributionGGX(normal, H, roughness);        
     float G   = GeometrySmith(normal, V, lightDir, roughness);      
     vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);       
@@ -100,7 +98,6 @@ vec3 PBRLight(vec3 lightDir, vec3 radiance, vec3 normal, vec3 V, vec3 color){
     float denominator = 4.0 * max(dot(normal, V), 0.0) * max(dot(normal, lightDir), 0.0) + 0.0001;
     vec3 specular     = numerator / denominator;  
             
-    // add to outgoing radiance Lo
     float NdotL = max(dot(normal, lightDir), 0.0);   
 	return (kD * color / PI + specular) * radiance * NdotL;
 }
@@ -114,28 +111,15 @@ void main()
 {
     
     vec4 texture1Color = texture(texture1, fragTexCoord);
-    //UNCOMMENT IF YOU WANT MIX 2 TEXTURES
     vec4 texture2Color = texture(texture2, fragTexCoord);
 
     vec4 N = texture(textureNormal, fragTexCoord);
     vec3 normal = normalize((N*2.0-1.0).xyz);
 
-
-    //COMMENT TO USE 2 TEXTURES
-    //vec3 color = texture1Color.rgb;
-
-    //finalColor = mix(finalColor, asteroidColor.rgb, 0.3);
-    //vec3 finalColor = mix(vec3(1.0), texture.rgb, rustColor.r) + asteroidColor.rgb * 0.2;
-	//vec3 normal = vec3(0,0,1);
-    //vec3 normal = normalize(vecNormal);
-
     vec3 viewDir = normalize(viewDirTS);
-    //vec3 viewDir = normalize(cameraPos-worldPos);
 
 	vec3 lightDir = normalize(lightDirTS);
-    //vec3 lightDir = normalize(lightPos-worldPos);
 
-    //UNCOMMENT IF YOU WANT MIX 2 TEXTURES
     vec3 finalColor = mix(vec3(1.0), texture1Color.rgb, texture2Color.r);
     float diffuse = max(0, dot(normal, lightDir));
     vec3 color = ((finalColor * min(1, AMBIENT + diffuse))).rgb;
@@ -148,7 +132,6 @@ void main()
 	
 	//flashlight
 	vec3 spotlightDir= normalize(spotlightDirTS);
-	//vec3 spotlightDir= normalize(spotlightPos-worldPos);
 	
 
     float angle_atenuation = clamp((dot(-normalize(spotlightPos-worldPos),spotlightConeDir)-0.5)*3,0,1);
@@ -160,6 +143,4 @@ void main()
 
 
 	outColor = vec4(color - exp(-ilumination*exposition),1);
-	//outColor = vec4(roughness,metallic,0,1);
-    //outColor = vec4(test;
 }
