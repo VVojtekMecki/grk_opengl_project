@@ -64,25 +64,33 @@ glm::mat4 createCameraMatrix()
 	return cameraMatrix;
 }
 
+//glm::mat4 createPerspectiveMatrix()
+//{
+//	
+//	glm::mat4 perspectiveMatrix;
+//	float n = 0.05;
+//	float f = 1000.;
+//	float a1 = glm::min(aspectRatio, 1.f);
+//	float a2 = glm::min(1 / aspectRatio, 1.f);
+//	perspectiveMatrix = glm::mat4({
+//		1,0.,0.,0.,
+//		0.,aspectRatio,0.,0.,
+//		0.,0.,(f+n) / (n - f),2*f * n / (n - f),
+//		0.,0.,-1.,0.,
+//		});
+//
+//	
+//	perspectiveMatrix=glm::transpose(perspectiveMatrix);
+//
+//	return perspectiveMatrix;
+//}
+
 glm::mat4 createPerspectiveMatrix()
 {
-	
-	glm::mat4 perspectiveMatrix;
-	float n = 0.05;
-	float f = 1000.;
-	float a1 = glm::min(aspectRatio, 1.f);
-	float a2 = glm::min(1 / aspectRatio, 1.f);
-	perspectiveMatrix = glm::mat4({
-		1,0.,0.,0.,
-		0.,aspectRatio,0.,0.,
-		0.,0.,(f+n) / (n - f),2*f * n / (n - f),
-		0.,0.,-1.,0.,
-		});
-
-	
-	perspectiveMatrix=glm::transpose(perspectiveMatrix);
-
-	return perspectiveMatrix;
+	float fov = glm::radians(35.0f); // FOV
+	float n = 0.05f; // Near plane
+	float f = 1000.0f; // Far plane
+	return glm::perspective(fov, aspectRatio, n, f);
 }
 
 SpaceObjectsList spaceObjectsList(glfwGetTime(), createPerspectiveMatrix()* createCameraMatrix());
