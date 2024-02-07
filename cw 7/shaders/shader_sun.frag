@@ -106,7 +106,6 @@ void main()
 
 	vec3 distance = lightColor / pow(length(lightPos - worldPos), 2.0) * 20;
     vec3 toneMappedColor = toneMapping(vec3(textureColor) * distance);
-    //gamma correction
     toneMappedColor = pow(toneMappedColor, vec3(1.0/2.2));
 
 	vec4 texColor = vec4(toneMappedColor * lightColor * 0.22f, 1.0);
