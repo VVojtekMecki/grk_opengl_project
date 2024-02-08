@@ -9,7 +9,6 @@
 #include "Render_Utils.h"
 #include "Texture.h"
 
-#include "Box.cpp"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -22,10 +21,17 @@
 #include "objects/asteroids_list.cpp"
 #include "objects/details_list.cpp"
 #include "objects/shipToRepairHeader.h"
+//#include "../src/objects/Font.h"
 
+
+#include "Box.cpp"
+
+
+//GLuint quadVAO;
 
 GLuint program;
 GLuint programTex;
+GLuint programTextDisplay;
 
 
 Core::Shader_Loader shaderLoader;
@@ -35,10 +41,22 @@ glm::vec3 cameraDir = glm::vec3(1.f, 0.f, 1.f);
 
 glm::mat4 shipModelMatrix;
 
-glm::vec3 spaceshipPos = glm::vec3(-4.f, 0, 0);
+glm::vec3 spaceshipPos = glm::vec3(12.f, 0, 0);
 glm::vec3 spaceshipDir = glm::vec3(1.f, 0.f, 0.f);
-GLuint VAO,VBO;
 
+GLuint instructionsTexture;
+
+GLuint instructionsBoardTexture;
+GLuint instructionsBoardTexture0;
+GLuint instructionsBoardTexture1;
+GLuint instructionsBoardTexture2;
+GLuint instructionsBoardTexture3;
+GLuint instructionsBoardTextureCongrats;
+
+GLuint instructionsBoardNormal;
+
+GLuint amountOfPickedItemsPaths[] = { instructionsBoardTexture0, instructionsBoardTexture1,instructionsBoardTexture2, instructionsBoardTexture3 };
+//int amountOfPickedItemsTab = 0;
 namespace detailsTextures {
 	GLuint engineDetailTexture;
 	GLuint engineDetailNormal;
@@ -48,12 +66,17 @@ namespace detailsTextures {
 	GLuint crewMemberNormal;
 
 };
+
+
 Core::RenderContext spaceshipEngineDetailContext;
 Core::RenderContext firstAidBoxContext;
 Core::RenderContext crewMemberContext;
+Core::RenderContext instructionsBoardContext;
 
 bool isPKeyPressed = false;
 bool isRKeyPressed = false;
+bool isIKeyPressed = false;
+bool isTabKeyPressed = false;
 
 bool canPickUpEngine = false;
 bool canPickUpKit = false;
@@ -63,6 +86,8 @@ bool canPickUpCrew = false;
 bool drawSpaceshipEngine = true;
 bool drawSpaceshipKit = true;
 bool drawSpaceshipCrew = true;
+bool drawInstructions = true;
+bool drawCongratulations = true;
 
 bool isDragging = false;
 
@@ -153,10 +178,10 @@ void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 m
 }
 
 
-
 void renderScene(GLFWwindow* window)
 {
-    	
+
+
 
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -166,6 +191,7 @@ void renderScene(GLFWwindow* window)
 	deltaTime = glm::min(deltaTime, 0.1f);
 	lastFrameTime = timeGl;
 	
+
 
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix() * glm::translate(cameraPos);
 	transformation = viewProjectionMatrix;
@@ -214,12 +240,15 @@ void renderScene(GLFWwindow* window)
 	player.ship->drawObjectTexture(projectionMatrix, shipModelMatrix);
 
 
+
+
 	std::map<std::string, glm::mat4> shipRepairMatrixMap = {
-	  {"shipToRepair",glm::translate(glm::vec3(27.5f, 4, 0)) * glm::scale(glm::vec3(0.15f))}
+	  {"shipToRepair",glm::translate(glm::vec3(-27.5f, 4, 0)) * glm::scale(glm::vec3(0.15f))}
 	};
 
 	shipToRepair.repair->drawObjectTexture(projectionMatrix, shipRepairMatrixMap.at("shipToRepair"));
 
+	
 
 	//together for every detail
 
@@ -278,7 +307,7 @@ void renderScene(GLFWwindow* window)
 	spaceshipPosCOPY.y -= 0.3;
 
 	//start kit
-	kitMatrix = glm::eulerAngleX(timeGl / 12.f) * glm::translate(glm::vec3(12.7f, 5.f, 0)) * glm::eulerAngleY(timeGl / 12.f);
+	kitMatrix = glm::eulerAngleX(timeGl / 12.f) * glm::translate(glm::vec3(-12.7f, 5.f, 0)) * glm::eulerAngleY(timeGl / 12.f);
 	glm::vec3 kitDetailTranslationVec = glm::vec3(kitMatrix[3]);
 	if (glm::distance(shipTranslationVec, kitDetailTranslationVec) < 1.0f && !isDragging)
 	{
@@ -356,11 +385,30 @@ void renderScene(GLFWwindow* window)
 
 	if (shipToRepair.repair->amountOfPickedUpObjects == 3) {
 		shipToRepair.repair->indexNormal = 1;
+		drawObjectTexture(programTex, instructionsBoardContext, glm::rotate(glm::translate(glm::vec3(0.f, 10.f, 0)), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f))* glm::rotate(glm::translate(glm::vec3(0.f, 0, 0)), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f))* glm::scale(glm::vec3(2.f)), instructionsBoardTextureCongrats, instructionsBoardNormal);
+
 
 	}
 
+	glm::mat4 blackboardRotationMatrix;
+	glm::vec3 blackboardRotationTranslVec = blackboardRotationMatrix[3];
+	if ((glm::distance(shipTranslationVec, blackboardRotationTranslVec) < 3.0f)|| isIKeyPressed) {
+		drawInstructions = false;
+	}
+	if (drawInstructions) {
+		glm::mat4 blackboardRotationY = glm::rotate(glm::translate(glm::vec3(14.f, -0.5f, 0)), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 blackboardRotationX = glm::rotate(glm::translate(glm::vec3(0.f, 0, 0)), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		 blackboardRotationMatrix = blackboardRotationY * blackboardRotationX;
 
+		drawObjectTexture(programTex, instructionsBoardContext, blackboardRotationMatrix * glm::scale(glm::vec3(1.4f)), instructionsBoardTexture, instructionsBoardNormal);
+	}
 
+	if (isTabKeyPressed) {
+		drawObjectTexture(programTex, instructionsBoardContext, glm::rotate(glm::translate(glm::vec3(0.f, 10.f, 0)), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::translate(glm::vec3(0.f, 0, 0)), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::scale(glm::vec3(2.f)), amountOfPickedItemsPaths[shipToRepair.repair->amountOfPickedUpObjects], instructionsBoardNormal);
+
+	}
+	
+	
 
 	glfwSwapBuffers(window);
 }
@@ -386,6 +434,11 @@ void loadModelToContext(std::string path, Core::RenderContext& context)
 
 void init(GLFWwindow* window)
 {
+	//initSquare();
+	//instructionsTexture= Core::LoadTexture("textures/grid.png");
+	
+	////////////////////////////
+
 	
 
 	skybox.init();
@@ -394,10 +447,10 @@ void init(GLFWwindow* window)
 
 	glEnable(GL_DEPTH_TEST);
 	program = shaderLoader.CreateProgram("shaders/shader_5_1.vert", "shaders/shader_5_1.frag");
-
-
 	programTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex_copy.vert", "shaders/shader_5_1_tex_copy.frag");
 
+	programTextDisplay = shaderLoader.CreateProgram("shaders/textShader.vert", "shaders/textShader.frag");
+	
 	detailsTextures::engineDetailTexture = Core::LoadTexture("textures/details/airplane_engine_BaseColor.png");
 	detailsTextures::engineDetailNormal = Core::LoadTexture("textures/details/airplane_engine_Normal.png");
 
@@ -407,24 +460,33 @@ void init(GLFWwindow* window)
 	detailsTextures::crewMember = Core::LoadTexture("textures/details/Alien_BaseColor.png");
 	detailsTextures::crewMemberNormal = Core::LoadTexture("textures/details/Alien_Normal.png");
 
+	instructionsBoardTexture = Core::LoadTexture("textures/text/BlackboardBake.png");
+
+	instructionsBoardTexture0 = Core::LoadTexture("textures/text/Blackboard0of3.png");
+	instructionsBoardTexture1 = Core::LoadTexture("textures/text/Blackboard1of3.png");
+	instructionsBoardTexture2 = Core::LoadTexture("textures/text/Blackboard2of3.png");
+	instructionsBoardTexture3 = Core::LoadTexture("textures/text/Blackboard3of3.png");
+	
+	instructionsBoardTextureCongrats = Core::LoadTexture("textures/text/Blackboard3of3Destroy.png");
+
+	instructionsBoardNormal = Core::LoadTexture("textures/text/BlackboardNormal.png");
+
+
 	loadModelToContext("./models/airplane-engine-detail.obj", spaceshipEngineDetailContext);
 	loadModelToContext("./models/Firstaidbox.obj", firstAidBoxContext);
 	loadModelToContext("./models/crew_member.obj", crewMemberContext);
+
+	loadModelToContext("./models/Chalkboard.fbx", instructionsBoardContext);
 
 	spaceObjectsList.init();
 	asteroidsList.init();
 	player.init();
 	shipToRepair.init();
-	//detailslist.init();
+	
 }
 
 void shutdown(GLFWwindow* window)
 {
-
-
-
-
-
 	shaderLoader.DeleteProgram(program);
 }
 
@@ -464,17 +526,25 @@ void processInput(GLFWwindow* window)
 	if ((glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) && (canPickUpEngine || canPickUpKit || canPickUpCrew))
 	{
 		isPKeyPressed = true;
-		//std::cout << "iside input: P    canPickUpEngine " << canPickUpEngine << "	canPickUpKit " << canPickUpKit<< "	canPickUpCrew " << canPickUpCrew << std::endl;
 	}
 
 	if ((glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) && (isKitPickedUp || isEnginePickedUp || isCrewPickedUp) && (isKitCloseToShipRepair || isEngineCloseToShipRepair || isCrewCloseToShipRepair))
 	{
 		isRKeyPressed = true;
-		//std::cout << "iside input: R   " << isRKeyPressed << std::endl;
 
 	}
 
+	if ((glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) )
+	{
+		isIKeyPressed = true;
 
+	}
+	if ((glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS))
+	{
+		isTabKeyPressed = true;
+
+	}else 
+		isTabKeyPressed = false;
 
 
 	cameraPos = spaceshipPos - 1.5 * spaceshipDir + glm::vec3(0, 1, 0) * 0.5f;
