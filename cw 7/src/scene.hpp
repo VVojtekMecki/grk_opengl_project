@@ -90,10 +90,10 @@ float aspectRatio = 1.f;
 
 float lastFrameTime = 0.0f;
 float deltaTime = 0.0f;
-float planetRough = 0.3f;
-float planetMetal = 0.3f;
-float shipRough = 1.3f;
-float shipMetal = 1.5f;
+
+
+float shipRough = 0.3f;
+float shipMetal = 1.f;
 float lightPower = 20.f;
 glm::vec3 lightColor = glm::vec3(lightPower, lightPower, lightPower);
 
@@ -177,19 +177,21 @@ void renderScene(GLFWwindow* window)
 		{ "earth",glm::vec3(33.f, 0, 0)},
 		{ "moon",  glm::vec3(15.f, 1.5, 0)},
 		{ "secondMoon",  glm::vec3(15.f, -0.5, 0)},
+		{ "thirdMoon",  glm::vec3(15.f, -2, 0)},
 		{ "mars", glm::vec3(15.f, 0, 0)},
 		{ "aliensPlanet", glm::vec3(24.f, -2., 0)},
 		{ "venus", glm::vec3(45.f, 1., 0)},
 		{ "humea", glm::vec3(20.f, -2., 0)},
-		{ "mercury",glm::vec3(55.f, 1.5, 0)},
+		{ "mercury",glm::vec3(15.f, 1.5, 0)},
 		{ "cloudsAnimation", glm::vec3(50.f, 0, 0)},
 	};
 
 	std::map<std::string, glm::mat4> modelMatrixMap = {
 		{ "sun", glm::mat4() * glm::scale(glm::vec3(8.f)) },
 		{ "earth", glm::eulerAngleY(timeGl / 9) * glm::translate(startPlanetPosition.at("earth")) * glm::scale(glm::vec3(4.2f))},
-		{ "moon", glm::eulerAngleY(timeGl / 9) * glm::translate(startPlanetPosition.at("earth")) * glm::eulerAngleY(timeGl) * glm::translate(glm::vec3(5.2f, 0, 0)) * glm::scale(glm::vec3(0.4f)) },
-		{ "secondMoon", glm::eulerAngleY(timeGl / 9) * glm::translate(startPlanetPosition.at("earth")) * glm::eulerAngleY(timeGl / 1.2f) * glm::translate(glm::vec3(6.f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
+		{ "moon", glm::eulerAngleY(timeGl / 9) * glm::translate(startPlanetPosition.at("earth")) * glm::eulerAngleY(timeGl) * glm::eulerAngleX(timeGl) * glm::translate(glm::vec3(5.2f, 0, 0)) * glm::scale(glm::vec3(0.4f)) },
+		{ "secondMoon", glm::eulerAngleY(timeGl / 9) * glm::translate(startPlanetPosition.at("earth")) * glm::eulerAngleY(timeGl / 1.4f) * glm::eulerAngleX(timeGl/10) * glm::translate(glm::vec3(7.f, 0, 0)) * glm::scale(glm::vec3(1.4f))},
+		{ "thirdMoon", glm::eulerAngleY(timeGl / 9) * glm::translate(startPlanetPosition.at("earth")) * glm::eulerAngleY(timeGl / 1.1f) * glm::eulerAngleX(timeGl/8) * glm::translate(glm::vec3(5.8f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
 		{ "mars", glm::eulerAngleY(timeGl / 2) * glm::translate(startPlanetPosition.at("mars")) * glm::scale(glm::vec3(1.2f))},
 		{ "aliensPlanet", glm::eulerAngleY(timeGl / 8.f) * glm::translate(startPlanetPosition.at("aliensPlanet")) * glm::scale(glm::vec3(2.4f))},
 		{ "venus", glm::eulerAngleY(timeGl / 10) * glm::translate(startPlanetPosition.at("venus")) * glm::scale(glm::vec3(1.6f))},
@@ -228,12 +230,13 @@ void renderScene(GLFWwindow* window)
 			startPlanetPosition.at(obj.name), spotlightPos, spotlightConeDir);
 	}
 
+
 	for (Asteroid* obj : asteroidsList.objectsList) {
 		glm::mat4 asteroid1Scale = glm::scale(glm::vec3(0.5f));
 		glm::mat4 asteroid1Rotate = glm::rotate(timeGl * 0.05f, glm::vec3(0, 1, 0));
 		auto pos = obj->getPosition();
 		glm::mat4 asteroid1Translate = glm::translate(glm::vec3(pos.x, pos.y, pos.z));
-		obj->drawWithPBR(projectionMatrix, asteroid1Scale * asteroid1Rotate * asteroid1Translate, planetRough, planetMetal, lightColor, lightPower, cameraPos,
+		obj->drawWithPBR(projectionMatrix, asteroid1Scale * asteroid1Rotate * asteroid1Translate, 0.4, 0.4, lightColor, lightPower, cameraPos,
 			glm::vec3(pos.x, pos.y, pos.z), spotlightPos, spotlightConeDir);
 	}
 

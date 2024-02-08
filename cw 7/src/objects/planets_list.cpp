@@ -125,8 +125,12 @@ public:
 		CloudedPlanet* secondMoon = new CloudedPlanet("secondMoon", programPBREarth, sphereContext, SpaceObjectsList::moonTexture, SpaceObjectsList::moonNormalTexture, SpaceObjectsList::moonTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("secondMoon", secondMoon));
 
-		CloudedPlanet* mars = new CloudedPlanet("mars", programPBREarth, sphereContext, SpaceObjectsList::marsTexture, SpaceObjectsList::marsNormalTexture, SpaceObjectsList::marsTexture);
-		spaceObjectsList.push_back(SpaceObjectProperties("mars", mars));
+		/*CloudedPlanet* thirdMoon = new CloudedPlanet("secondMoon", programPBREarth, sphereContext, SpaceObjectsList::moonTexture, SpaceObjectsList::moonNormalTexture, SpaceObjectsList::moonTexture);
+		spaceObjectsList.push_back(SpaceObjectProperties("secondMoon", thirdMoon));*/
+
+		/*CloudedPlanet* mars = new CloudedPlanet("mars", programPBREarth, sphereContext, SpaceObjectsList::marsTexture, SpaceObjectsList::marsNormalTexture, SpaceObjectsList::marsTexture);
+		spaceObjectsList.push_back(SpaceObjectProperties("mars", mars));*/
+
 
 		CloudsAnimatedPlanet* aliensPlanet = new CloudsAnimatedPlanet("aliensPlanet", programPlanetAnimatedClouds, sphereContext, SpaceObjectsList::aliensPlanetTexture, SpaceObjectsList::aliensPlanetNormalTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("aliensPlanet", aliensPlanet));
