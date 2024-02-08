@@ -230,6 +230,7 @@ void renderScene(GLFWwindow* window)
 			startPlanetPosition.at(obj.name), spotlightPos, spotlightConeDir);
 	}
 
+
 	for (Asteroid* obj : asteroidsList.objectsList) {
 		glm::mat4 asteroid1Scale = glm::scale(glm::vec3(0.5f));
 		glm::mat4 asteroid1Rotate = glm::rotate(timeGl * 0.05f, glm::vec3(0, 1, 0));
