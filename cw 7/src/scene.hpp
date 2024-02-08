@@ -91,6 +91,10 @@ float aspectRatio = 1.f;
 float lastFrameTime = 0.0f;
 float deltaTime = 0.0f;
 
+glm::vec3 cameraTargetDir = spaceshipDir;
+glm::vec3 cameraVelocity = glm::vec3(0.0f);
+float smoothTime = 0.1f;
+
 
 float shipRough = 0.3f;
 float shipMetal = 1.f;
@@ -131,6 +135,7 @@ AsteroidsList asteroidsList;
 PlayerShip player;
 
 Skybox skybox;
+SunObject sun;
 
 
 void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID, GLuint normalmapId) {
@@ -148,13 +153,24 @@ void drawObjectTexture(GLuint program, Core::RenderContext& context, glm::mat4 m
 	glUseProgram(0);
 }
 
+void updateCamera(float deltaTime) {
+	cameraDir += (cameraTargetDir - cameraDir) * (deltaTime / smoothTime);
+
+	glm::vec3 tiltAxis = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), cameraDir));
+	float tiltAngle = glm::length(glm::cross(cameraDir, cameraTargetDir)) * 5.0f;
+	glm::quat tiltRotation = glm::angleAxis(glm::radians(tiltAngle), tiltAxis);
+	cameraDir = glm::rotate(tiltRotation, cameraDir);
+
+	cameraPos = spaceshipPos - 1.5f * cameraDir + glm::vec3(0, 1, 0) * 0.5f;
+}
 
 
-SunObject sun;
+
 
 void renderScene(GLFWwindow* window)
 {
-    	
+	cameraTargetDir = spaceshipDir;
+	//updateCamera(deltaTime);
 
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
