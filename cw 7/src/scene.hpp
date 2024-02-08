@@ -189,7 +189,7 @@ void renderScene(GLFWwindow* window)
 		{ "sun", glm::mat4() * glm::scale(glm::vec3(8.f)) },
 		{ "earth", glm::eulerAngleY(timeGl / 5) * glm::translate(startPlanetPosition.at("earth")) * glm::scale(glm::vec3(3.2f))},
 		{ "moon", glm::eulerAngleY(timeGl / 5) * glm::translate(startPlanetPosition.at("earth")) * glm::eulerAngleY(timeGl) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::scale(glm::vec3(0.4f)) },
-		{ "secondMoon", glm::eulerAngleY(timeGl / 5) * glm::translate(startPlanetPosition.at("earth")) * glm::eulerAngleY(timeGl / 1.2f) * glm::translate(glm::vec3(5.f, 0, 0)) * glm::scale(glm::vec3(0.6f))},
+		{ "secondMoon", glm::eulerAngleY(timeGl / 5) * glm::translate(startPlanetPosition.at("earth")) * glm::eulerAngleY(timeGl / 1.2f) * glm::translate(glm::vec3(5.2f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
 		{ "mars", glm::eulerAngleY(timeGl / 2) * glm::translate(startPlanetPosition.at("mars")) * glm::scale(glm::vec3(1.2f))},
 		{ "aliensPlanet", glm::eulerAngleY(timeGl / 4.f) * glm::translate(startPlanetPosition.at("aliensPlanet")) * glm::scale(glm::vec3(1.5f))},
 		{ "venus", glm::eulerAngleY(timeGl / 8) * glm::translate(startPlanetPosition.at("venus")) * glm::scale(glm::vec3(1.6f))},
@@ -229,10 +229,16 @@ void renderScene(GLFWwindow* window)
 	shipModelMatrix = glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.04f));
 
 	std::map<std::string, glm::mat4> shipRepairMatrixMap = {
-	  {"shipToRepair",glm::translate(glm::vec3(27.5f, 4, 0)) * glm::scale(glm::vec3(0.15f))}
+	  {"shipToRepair",glm::translate(glm::vec3(27.5f, 4, 0)) * glm::scale(glm::vec3(0.15f))},
+	  {"shipRepaired", glm::translate(glm::vec3(27.5f, 4, 0)) * glm::scale(glm::vec3(0.15f)) * glm::eulerAngleY(timeGl / 10)},
 	};
 
-	shipToRepair.repair->drawObjectTexture(projectionMatrix, shipRepairMatrixMap.at("shipToRepair"));
+	if (shipToRepair.repair->amountOfPickedUpObjects == 3) {
+		shipToRepair.repair->drawObjectTexture(projectionMatrix, shipRepairMatrixMap.at("shipRepaired"));
+	}
+	else {
+		shipToRepair.repair->drawObjectTexture(projectionMatrix, shipRepairMatrixMap.at("shipToRepair"));
+	}
 
 
 	glm::vec3 shipRepairTranslationVec = glm::vec3(shipRepairMatrixMap.at("shipToRepair")[3]);
@@ -367,7 +373,6 @@ void renderScene(GLFWwindow* window)
 
 	if (shipToRepair.repair->amountOfPickedUpObjects == 3) {
 		shipToRepair.repair->indexNormal = 1;
-
 	}
 
 
