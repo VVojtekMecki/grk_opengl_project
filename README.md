@@ -12,8 +12,11 @@ Głównym celem gry jest naprawienie uszkodzonego statku poprzez odnalezienie or
 
 ## Sterowanie:
 W / A / S / D - poruszanie się statkiem
+
 P - podnoszenie przedmiotu, który jest w zasięgu statku
+
 R - oddanie przedmiotu uszkodzonemu statkowi, jeżeli statek jest w zasięgu
+
 Lewy Shift + W - zwiększona prędkość
 
 
