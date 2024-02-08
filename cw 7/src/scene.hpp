@@ -31,7 +31,6 @@
 
 GLuint program;
 GLuint programTex;
-GLuint programTextDisplay;
 
 
 Core::Shader_Loader shaderLoader;
@@ -449,8 +448,6 @@ void init(GLFWwindow* window)
 	program = shaderLoader.CreateProgram("shaders/shader_5_1.vert", "shaders/shader_5_1.frag");
 	programTex = shaderLoader.CreateProgram("shaders/shader_5_1_tex_copy.vert", "shaders/shader_5_1_tex_copy.frag");
 
-	programTextDisplay = shaderLoader.CreateProgram("shaders/textShader.vert", "shaders/textShader.frag");
-	
 	detailsTextures::engineDetailTexture = Core::LoadTexture("textures/details/airplane_engine_BaseColor.png");
 	detailsTextures::engineDetailNormal = Core::LoadTexture("textures/details/airplane_engine_Normal.png");
 
