@@ -175,27 +175,47 @@ void renderScene(GLFWwindow* window)
 	std::map<std::string, glm::vec3> startPlanetPosition = {
 		{ "sun", glm::vec3()},
 		{ "earth",glm::vec3(33.f, 0, 0)},
-		{ "moon",  glm::vec3(15.f, 0, 0)},
-		{ "secondMoon",  glm::vec3(15.f, 0, 0)},
+		{ "moon",  glm::vec3(15.f, 1.5, 0)},
+		{ "secondMoon",  glm::vec3(15.f, -0.5, 0)},
 		{ "mars", glm::vec3(15.f, 0, 0)},
-		{ "aliensPlanet", glm::vec3(27.f, 0, 0)},
-		{ "venus", glm::vec3(45.f, 0, 0)},
+		{ "aliensPlanet", glm::vec3(24.f, -2., 0)},
+		{ "venus", glm::vec3(45.f, 1., 0)},
 		{ "humea", glm::vec3(20.f, -2., 0)},
-		{ "mercury",glm::vec3(55.f, 0, 0)},
+		{ "mercury",glm::vec3(55.f, 1.5, 0)},
 		{ "cloudsAnimation", glm::vec3(50.f, 0, 0)},
 	};
 
 	std::map<std::string, glm::mat4> modelMatrixMap = {
 		{ "sun", glm::mat4() * glm::scale(glm::vec3(8.f)) },
-		{ "earth", glm::eulerAngleY(timeGl / 5) * glm::translate(startPlanetPosition.at("earth")) * glm::scale(glm::vec3(3.2f))},
-		{ "moon", glm::eulerAngleY(timeGl / 5) * glm::translate(startPlanetPosition.at("earth")) * glm::eulerAngleY(timeGl) * glm::translate(glm::vec3(4.f, 0, 0)) * glm::scale(glm::vec3(0.4f)) },
-		{ "secondMoon", glm::eulerAngleY(timeGl / 5) * glm::translate(startPlanetPosition.at("earth")) * glm::eulerAngleY(timeGl / 1.2f) * glm::translate(glm::vec3(5.2f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
+		{ "earth", glm::eulerAngleY(timeGl / 9) * glm::translate(startPlanetPosition.at("earth")) * glm::scale(glm::vec3(4.2f))},
+		{ "moon", glm::eulerAngleY(timeGl / 9) * glm::translate(startPlanetPosition.at("earth")) * glm::eulerAngleY(timeGl) * glm::translate(glm::vec3(5.2f, 0, 0)) * glm::scale(glm::vec3(0.4f)) },
+		{ "secondMoon", glm::eulerAngleY(timeGl / 9) * glm::translate(startPlanetPosition.at("earth")) * glm::eulerAngleY(timeGl / 1.2f) * glm::translate(glm::vec3(6.f, 0, 0)) * glm::scale(glm::vec3(0.8f))},
 		{ "mars", glm::eulerAngleY(timeGl / 2) * glm::translate(startPlanetPosition.at("mars")) * glm::scale(glm::vec3(1.2f))},
-		{ "aliensPlanet", glm::eulerAngleY(timeGl / 4.f) * glm::translate(startPlanetPosition.at("aliensPlanet")) * glm::scale(glm::vec3(1.5f))},
-		{ "venus", glm::eulerAngleY(timeGl / 8) * glm::translate(startPlanetPosition.at("venus")) * glm::scale(glm::vec3(1.6f))},
-		{ "humea", glm::eulerAngleY(timeGl / 5) * glm::translate(startPlanetPosition.at("humea")) * glm::scale(glm::vec3(2.f))},
-		{ "mercury", glm::eulerAngleY(timeGl / 10) * glm::translate(startPlanetPosition.at("mercury")) * glm::scale(glm::vec3(0.79f))},
+		{ "aliensPlanet", glm::eulerAngleY(timeGl / 8.f) * glm::translate(startPlanetPosition.at("aliensPlanet")) * glm::scale(glm::vec3(2.4f))},
+		{ "venus", glm::eulerAngleY(timeGl / 10) * glm::translate(startPlanetPosition.at("venus")) * glm::scale(glm::vec3(1.6f))},
+		{ "humea", glm::eulerAngleY(timeGl / 6) * glm::translate(startPlanetPosition.at("humea")) * glm::scale(glm::vec3(1.5f))},
+		{ "mercury", glm::eulerAngleY(timeGl / 12) * glm::translate(startPlanetPosition.at("mercury")) * glm::scale(glm::vec3(0.79f))},
 		{ "cloudsAnimation", glm::eulerAngleY(timeGl / 30)* glm::translate(startPlanetPosition.at("cloudsAnimation"))* glm::scale(glm::vec3(1.8f))},
+	};
+
+	struct MaterialProperties {
+		float roughness;
+		float metallic;
+
+		MaterialProperties(float r = 0.3f, float m = 0.3f) : roughness(r), metallic(m) {}
+	};
+
+	std::map<std::string, MaterialProperties> pbrValues = {
+		{"sun", MaterialProperties(0.3f, 0.3f)},
+		{"earth", MaterialProperties(0.3f, 0.4f)},
+		{"moon", MaterialProperties(0.2f, 0.6f)},
+		{"secondMoon", MaterialProperties(0.2f, 0.6f)},
+		{"mars", MaterialProperties(0.3f, 0.5f)},
+		{"aliensPlanet", MaterialProperties(0.4f, 0.8f)},
+		{"venus", MaterialProperties(0.5f, 0.5f)},
+		{"humea", MaterialProperties(0.8f, 0.3f)},
+		{"mercury", MaterialProperties(0.5f, 0.2f)},
+		{"cloudsAnimation", MaterialProperties(0.3f, 0.3f)}
 	};
 
 	
@@ -204,7 +224,7 @@ void renderScene(GLFWwindow* window)
 	sun.object->drawObject(projectionMatrix, modelMatrixMap.at("sun"), cameraPos, lightPower);
 
 	for (SpaceObjectProperties obj : spaceObjectsList.spaceObjectsList) {
-		obj.object->drawWithPBR(projectionMatrix, modelMatrixMap.at(obj.name), planetRough, planetMetal, lightColor, lightPower, cameraPos, 
+		obj.object->drawWithPBR(projectionMatrix, modelMatrixMap.at(obj.name), pbrValues.at(obj.name).roughness, pbrValues.at(obj.name).metallic, lightColor, lightPower, cameraPos,
 			startPlanetPosition.at(obj.name), spotlightPos, spotlightConeDir);
 	}
 

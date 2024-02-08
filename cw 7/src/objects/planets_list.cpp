@@ -128,7 +128,7 @@ public:
 		CloudedPlanet* mars = new CloudedPlanet("mars", programPBREarth, sphereContext, SpaceObjectsList::marsTexture, SpaceObjectsList::marsNormalTexture, SpaceObjectsList::marsTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("mars", mars));
 
-		CloudsAnimatedPlanet* aliensPlanet = new CloudsAnimatedPlanet("aliensPlanet", programPBREarth, sphereContext, SpaceObjectsList::aliensPlanetTexture, SpaceObjectsList::aliensPlanetNormalTexture);
+		CloudsAnimatedPlanet* aliensPlanet = new CloudsAnimatedPlanet("aliensPlanet", programPlanetAnimatedClouds, sphereContext, SpaceObjectsList::aliensPlanetTexture, SpaceObjectsList::aliensPlanetNormalTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("aliensPlanet", aliensPlanet));
 
 		CloudedPlanet* venus = new CloudedPlanet("venus", programPBREarth, sphereContext, SpaceObjectsList::venusTexture, SpaceObjectsList::venusNormalTexture, SpaceObjectsList::venusTexture);
