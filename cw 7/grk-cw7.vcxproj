@@ -44,6 +44,8 @@
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\bloom.frag" />
+    <None Include="shaders\bloom.vert" />
     <None Include="shaders\PBRforShip.frag" />
     <None Include="shaders\PBRforShip.vert" />
     <None Include="shaders\PBRforEarth.frag" />
