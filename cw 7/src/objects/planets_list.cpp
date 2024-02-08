@@ -122,10 +122,13 @@ public:
 		CloudedPlanet* moon = new CloudedPlanet("moon", programPBREarth, sphereContext, SpaceObjectsList::moonTexture, SpaceObjectsList::moonNormalTexture, SpaceObjectsList::moonTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("moon", moon));
 
+		CloudedPlanet* secondMoon = new CloudedPlanet("secondMoon", programPBREarth, sphereContext, SpaceObjectsList::moonTexture, SpaceObjectsList::moonNormalTexture, SpaceObjectsList::moonTexture);
+		spaceObjectsList.push_back(SpaceObjectProperties("secondMoon", secondMoon));
+
 		CloudedPlanet* mars = new CloudedPlanet("mars", programPBREarth, sphereContext, SpaceObjectsList::marsTexture, SpaceObjectsList::marsNormalTexture, SpaceObjectsList::marsTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("mars", mars));
 
-		CloudedPlanet* aliensPlanet = new CloudedPlanet("aliensPlanet", programPBREarth, sphereContext, SpaceObjectsList::aliensPlanetTexture, SpaceObjectsList::aliensPlanetNormalTexture, SpaceObjectsList::aliensPlanetCloudsTexture);
+		CloudsAnimatedPlanet* aliensPlanet = new CloudsAnimatedPlanet("aliensPlanet", programPBREarth, sphereContext, SpaceObjectsList::aliensPlanetTexture, SpaceObjectsList::aliensPlanetNormalTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("aliensPlanet", aliensPlanet));
 
 		CloudedPlanet* venus = new CloudedPlanet("venus", programPBREarth, sphereContext, SpaceObjectsList::venusTexture, SpaceObjectsList::venusNormalTexture, SpaceObjectsList::venusTexture);
@@ -137,8 +140,6 @@ public:
 		CloudedPlanet* mercury = new CloudedPlanet("mercury", programPBREarth, sphereContext, SpaceObjectsList::mercuryTexture, SpaceObjectsList::mercuryNormalTexture, SpaceObjectsList::mercuryTexture);
 		spaceObjectsList.push_back(SpaceObjectProperties("mercury", mercury));
 
-		/*CloudsAnimationPlanet* cloudsAnimation = new CloudsAnimationPlanet("cloudsAnimation", programCloudsAnimation, sphereContext, emptyTexture, emptyNormals);
-		spaceObjectsList.push_back(SpaceObjectProperties("cloudsAnimation", cloudsAnimation));*/
 	}
 
 	void updateTime() {
